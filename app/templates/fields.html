@@ -1,0 +1,260 @@
+{% extends "base.html" %}
+
+{% block title %}Champs - AgriTechPro{% endblock %}
+
+{% block content %}
+<div class="container mb-5 pb-5">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center py-3">
+        <div class="d-flex align-items-center">
+            <a href="{{ url_for('main.dashboard') }}" class="text-dark me-3">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <h1 class="mb-0">Mes Champs</h1>
+        </div>
+        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addFieldModal">
+            <i class="fas fa-plus me-2"></i>Ajouter un champ
+        </button>
+    </div>
+
+    <!-- Liste des champs -->
+    <div class="fields-grid mt-4">
+        {% if fields %}
+            {% for field in fields %}
+            <div class="field-card">
+                <div class="field-image">
+                    {% if field.image_path %}
+                        <img src="{{ url_for('static', filename='images/fields/' + field.image_path) }}" alt="{{ field.name }}">
+                    {% else %}
+                        <div class="placeholder-image">
+                            <i class="fas fa-seedling"></i>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="field-content">
+                    <h3>{{ field.name }}</h3>
+                    <div class="field-details">
+                        <p><i class="fas fa-ruler-combined"></i> {{ field.size }} hectares</p>
+                        <p><i class="fas fa-leaf"></i> {{ field.crop_type }}</p>
+                        <p><i class="fas fa-water"></i> {{ field.irrigation_system }}</p>
+                    </div>
+                    <a href="{{ url_for('main.field_details', field_id=field.id) }}" class="btn btn-outline-success w-100">
+                        Voir les détails
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-seedling fa-3x text-muted mb-3"></i>
+                <h3>Aucun champ</h3>
+                <p class="text-muted">Commencez par ajouter votre premier champ</p>
+                <button class="btn btn-success mt-3" data-bs-toggle="modal" data-bs-target="#addFieldModal">
+                    <i class="fas fa-plus me-2"></i>Ajouter un champ
+                </button>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal d'ajout de champ -->
+<div class="modal fade" id="addFieldModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Ajouter un champ</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('main.add_field') }}" method="POST" enctype="multipart/form-data" id="addFieldForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Nom du champ</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="size" class="form-label">Superficie (hectares)</label>
+                        <input type="number" step="0.1" class="form-control" id="size" name="size" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="crop_type" class="form-label">Type de culture</label>
+                        <select class="form-select" id="crop_type" name="crop_type" required>
+                            <option value="">Sélectionner...</option>
+                            <option value="Mil">Mil</option>
+                            <option value="Sorgho">Sorgho</option>
+                            <option value="Maïs">Maïs</option>
+                            <option value="Riz">Riz</option>
+                            <option value="Arachide">Arachide</option>
+                            <option value="Niébé">Niébé</option>
+                            <option value="Manioc">Manioc</option>
+                            <option value="Coton">Coton</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="soil_type" class="form-label">Type de sol</label>
+                        <select class="form-select" id="soil_type" name="soil_type" required>
+                            <option value="Limoneux">Limoneux</option>
+                            <option value="Argileux">Argileux</option>
+                            <option value="Sableux">Sableux</option>
+                            <option value="Latéritique">Latéritique</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="irrigation_system" class="form-label">Système d'irrigation</label>
+                        <select class="form-select" id="irrigation_system" name="irrigation_system" required>
+                            <option value="Aucun">Aucun</option>
+                            <option value="Goutte-à-goutte">Goutte-à-goutte</option>
+                            <option value="Aspersion">Aspersion</option>
+                            <option value="Gravitaire">Gravitaire</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="drainage_system" class="form-label">Système de drainage</label>
+                        <select class="form-select" id="drainage_system" name="drainage_system" required>
+                            <option value="Aucun">Aucun</option>
+                            <option value="Surface">Surface</option>
+                            <option value="Souterrain">Souterrain</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="topography" class="form-label">Topographie</label>
+                        <select class="form-select" id="topography" name="topography" required>
+                            <option value="Plat">Plat</option>
+                            <option value="Pente douce">Pente douce</option>
+                            <option value="Pente forte">Pente forte</option>
+                            <option value="Vallonné">Vallonné</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="image" class="form-label">Image du champ (optionnel)</label>
+                        <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save me-2"></i>Enregistrer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+.fields-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.field-card {
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+}
+
+.field-card:hover {
+    transform: translateY(-5px);
+}
+
+.field-image {
+    height: 200px;
+    overflow: hidden;
+    position: relative;
+}
+
+.field-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.placeholder-image {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f9fa;
+}
+
+.placeholder-image i {
+    font-size: 3rem;
+    color: #28a745;
+}
+
+.field-content {
+    padding: 20px;
+}
+
+.field-content h3 {
+    margin: 0 0 15px;
+    color: #2c3e50;
+    font-size: 1.2rem;
+}
+
+.field-details {
+    margin-bottom: 15px;
+}
+
+.field-details p {
+    margin: 5px 0;
+    color: #666;
+}
+
+.field-details i {
+    width: 20px;
+    color: #28a745;
+    margin-right: 8px;
+}
+
+@media (max-width: 768px) {
+    .fields-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .container {
+        padding: 10px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('addFieldForm');
+    const cropTypeSelect = document.getElementById('crop_type');
+    const nameInput = document.getElementById('name');
+
+    // Mettre à jour automatiquement le nom du champ en fonction du type de culture
+    cropTypeSelect.addEventListener('change', function() {
+        if (this.value && !nameInput.value) {
+            nameInput.value = `Champ de ${this.value}`;
+        }
+    });
+
+    // Validation du formulaire
+    form.addEventListener('submit', function(e) {
+        const size = document.getElementById('size').value;
+        if (size <= 0) {
+            e.preventDefault();
+            alert('La superficie doit être supérieure à 0 hectares.');
+            return;
+        }
+    });
+});
+</script>
+{% endblock %}

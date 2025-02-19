@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block title %}Tableau de bord - AgriTechPro{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- En-tête avec météo -->
+    <div class="card bg-success text-white mb-4">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <div>
+                    <small>Bonjour ☀️</small>
+                    <h5 class="mb-0">{{ user.name }}</h5>
+                </div>
+                <div>
+                    <i class="fas fa-bell fs-4"></i>
+                </div>
+            </div>
+            <h2 class="mb-2">Kolda</h2>
+            <div class="d-flex align-items-center">
+                <i class="fas fa-map-marker-alt me-2"></i>
+                <span>Vélingara</span>
+            </div>
+            <div class="d-flex align-items-center mt-2">
+                <h3 class="mb-0">{{ weather.temperature }}°C</h3>
+                <div class="ms-3">
+                    <i class="fas fa-cloud-sun me-2"></i>
+                    <span>Probabilité de pluie {{ weather.precipitation_probability }}%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Champs -->
+    <div class="mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">Mes Champs</h5>
+            <a href="{{ url_for('main.fields') }}" class="btn btn-sm btn-outline-success">
+                Voir tous
+            </a>
+        </div>
+        <div class="row g-3">
+            {% if fields %}
+                {% for field in fields[:2] %}
+                <div class="col-6">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h6 class="card-title">{{ field.name }}</h6>
+                            <p class="card-text small mb-0">{{ field.crop_type }}</p>
+                            <p class="card-text small text-muted">{{ field.size }} hectares</p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body text-center py-4">
+                            <p class="mb-0">Vous n'avez pas encore de champs</p>
+                            <a href="{{ url_for('main.fields') }}" class="btn btn-success mt-2">
+                                Ajouter un champ
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Tâches -->
+    <div class="mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">Tâches</h5>
+            <a href="#" class="btn btn-sm btn-outline-success">
+                Voir toutes
+            </a>
+        </div>
+        <div class="list-group">
+            {% if tasks %}
+                {% for task in tasks %}
+                <div class="list-group-item">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0">{{ task.title }}</h6>
+                            <small class="text-muted">{{ task.field.name }}</small>
+                        </div>
+                        <small class="text-muted">{{ task.due_date.strftime('%d/%m/%Y') }}</small>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="list-group-item text-center py-4">
+                    <p class="mb-0">Aucune tâche en cours</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Navigation du bas -->
+<nav class="fixed-bottom bg-white border-top py-2">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col">
+                <a href="{{ url_for('main.dashboard') }}" class="text-success text-decoration-none">
+                    <i class="fas fa-home d-block mb-1"></i>
+                    <small>Accueil</small>
+                </a>
+            </div>
+            <div class="col">
+                <a href="{{ url_for('main.fields') }}" class="text-muted text-decoration-none">
+                    <i class="fas fa-map-marker-alt d-block mb-1"></i>
+                    <small>Champs</small>
+                </a>
+            </div>
+            <div class="col">
+                <a href="#" class="text-muted text-decoration-none">
+                    <i class="fas fa-tasks d-block mb-1"></i>
+                    <small>Tâches</small>
+                </a>
+            </div>
+            <div class="col">
+                <a href="#" class="text-muted text-decoration-none">
+                    <i class="fas fa-user d-block mb-1"></i>
+                    <small>Profil</small>
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+{% endblock %}

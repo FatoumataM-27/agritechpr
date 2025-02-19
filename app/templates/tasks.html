@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}Tâches - AgriTechPro{% endblock %}
+
+{% block content %}
+<div class="container mb-5 pb-5">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center py-3">
+        <div class="d-flex align-items-center">
+            <a href="{{ url_for('main.dashboard') }}" class="text-dark me-3">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <h5 class="mb-0">Tâches</h5>
+        </div>
+        <button class="btn btn-success rounded-circle" data-bs-toggle="modal" data-bs-target="#addTaskModal">
+            <i class="fas fa-plus"></i>
+        </button>
+    </div>
+
+    <!-- Filtres -->
+    <div class="task-filters mb-4">
+        <button class="btn btn-success me-2 active">À faire</button>
+        <button class="btn btn-outline-success">Terminées</button>
+    </div>
+
+    <!-- Liste des tâches -->
+    <div class="tasks-list">
+        {% for task in tasks %}
+        <div class="task-card mb-3">
+            <div class="d-flex align-items-start">
+                <div class="task-days me-3">
+                    <div class="bg-danger text-white rounded p-2 text-center">
+                        <strong>{{ task.days }}</strong><br>
+                        Jours
+                    </div>
+                </div>
+                <div class="flex-grow-1">
+                    <h6 class="mb-1">{{ task.title }}</h6>
+                    <p class="text-danger mb-0">Dans {{ task.days }} jours</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Modal d'ajout de tâche -->
+<div class="modal fade" id="addTaskModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Nouvelle tâche</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addTaskForm">
+                    <div class="mb-3">
+                        <label class="form-label">Titre de la tâche</label>
+                        <input type="text" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Champ concerné</label>
+                        <select class="form-control">
+                            <option value="rice">Champ de Riz</option>
+                            <option value="potato">Champ de Pommes de terre</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Date d'échéance</label>
+                        <input type="date" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="submit" form="addTaskForm" class="btn btn-success">Ajouter</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Navigation du bas -->
+<nav class="bottom-nav">
+    <a href="{{ url_for('main.dashboard') }}">
+        <i class="fas fa-home"></i>
+        <span>Accueil</span>
+    </a>
+    <a href="{{ url_for('main.fields') }}">
+        <i class="fas fa-seedling"></i>
+        <span>Champs</span>
+    </a>
+    <a href="{{ url_for('main.tasks') }}" class="active">
+        <i class="fas fa-tasks"></i>
+        <span>Tâches</span>
+    </a>
+    <a href="{{ url_for('main.data') }}">
+        <i class="fas fa-chart-bar"></i>
+        <span>Données</span>
+    </a>
+    <a href="{{ url_for('auth.profile') }}">
+        <i class="fas fa-user"></i>
+        <span>Profil</span>
+    </a>
+</nav>
+{% endblock %}

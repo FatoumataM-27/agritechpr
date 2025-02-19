@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Données - AgriTechPro{% endblock %}
+
+{% block content %}
+<div class="container mb-5 pb-5">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center py-3">
+        <div class="d-flex align-items-center">
+            <a href="{{ url_for('main.dashboard') }}" class="text-dark me-3">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <h5 class="mb-0">Données des régions du Sénégal</h5>
+        </div>
+    </div>
+
+    <!-- Carte du Sénégal -->
+    <div class="senegal-map mb-4">
+        <img src="{{ url_for('static', filename='images/senegal-map.png') }}" alt="Carte du Sénégal" class="img-fluid">
+    </div>
+
+    <!-- Barre de recherche -->
+    <div class="search-bar mb-4">
+        <div class="input-group">
+            <span class="input-group-text bg-white border-end-0">
+                <i class="fas fa-search text-muted"></i>
+            </span>
+            <input type="text" class="form-control border-start-0" placeholder="Rechercher une région...">
+        </div>
+    </div>
+
+    <!-- Données de la région -->
+    <div class="region-data">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title mb-4">Tambacounda</h5>
+                <div class="row">
+                    <div class="col-6 mb-3">
+                        <div class="text-muted">Température :</div>
+                        <div class="text-success">30°C</div>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <div class="text-muted">Précipitations :</div>
+                        <div class="text-success">58%</div>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <div class="text-muted">Humidité de l'air :</div>
+                        <div class="text-success">30%</div>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <div class="text-muted">Vent :</div>
+                        <div class="text-success">15 km/h</div>
+                    </div>
+                    <div class="col-6">
+                        <div class="text-muted">Rayonnement solaire :</div>
+                        <div class="text-success">13%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Navigation du bas -->
+<nav class="bottom-nav">
+    <a href="{{ url_for('main.dashboard') }}">
+        <i class="fas fa-home"></i>
+        <span>Accueil</span>
+    </a>
+    <a href="{{ url_for('main.fields') }}">
+        <i class="fas fa-seedling"></i>
+        <span>Champs</span>
+    </a>
+    <a href="{{ url_for('main.tasks') }}">
+        <i class="fas fa-tasks"></i>
+        <span>Tâches</span>
+    </a>
+    <a href="{{ url_for('main.data') }}" class="active">
+        <i class="fas fa-chart-bar"></i>
+        <span>Données</span>
+    </a>
+    <a href="{{ url_for('auth.profile') }}">
+        <i class="fas fa-user"></i>
+        <span>Profil</span>
+    </a>
+</nav>
+{% endblock %}

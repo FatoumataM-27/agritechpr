@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container field-details">
+    <!-- Back button -->
+    <div class="back-header">
+        <a href="{{ url_for('main.fields') }}" class="back-btn">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <h1>{{ field.name }}</h1>
+        <div class="dropdown">
+            <button class="btn" type="button" id="fieldOptionsDropdown" data-bs-toggle="dropdown">
+                <i class="fas fa-ellipsis-v"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item" href="{{ url_for('main.field_growth', field_id=field.id) }}">
+                    Voir le graphique d'évolution
+                </a></li>
+                <li><a class="dropdown-item" href="{{ url_for('main.edit_field', field_id=field.id) }}">
+                    Modifier le champs
+                </a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Field image -->
+    {% if field.image_path %}
+    <div class="field-image">
+        <img src="{{ url_for('static', filename='images/fields/' + field.image_path) }}" alt="{{ field.name }}">
+    </div>
+    {% endif %}
+
+    <!-- Weather conditions -->
+    <div class="weather-conditions">
+        <div class="condition">
+            <i class="fas fa-tint"></i>
+            <span>{{ field_weather.humidity }}%</span>
+        </div>
+        <div class="condition">
+            <i class="fas fa-thermometer-half"></i>
+            <span>{{ field_weather.temperature }}°c</span>
+        </div>
+        <div class="condition">
+            <i class="fas fa-cloud"></i>
+            <span>{{ field_weather.condition }}</span>
+        </div>
+    </div>
+
+    <!-- Field characteristics -->
+    <div class="characteristics">
+        <h2>Caractéristiques</h2>
+        <div class="date">{{ today.strftime('%d/%m/%Y') }}</div>
+        
+        <div class="char-grid">
+            <div class="char-item">
+                <span class="label">Superficie</span>
+                <span class="value">{{ field.size }} hectares</span>
+            </div>
+            <div class="char-item">
+                <span class="label">Type de sol</span>
+                <span class="value">{{ field.soil_type }}</span>
+            </div>
+            <div class="char-item">
+                <span class="label">Culture</span>
+                <span class="value">{{ field.crop_type }}</span>
+            </div>
+            <div class="char-item">
+                <span class="label">Système d'irrigation</span>
+                <span class="value">{{ field.irrigation_system }}</span>
+            </div>
+            <div class="char-item">
+                <span class="label">Système de drainage</span>
+                <span class="value">{{ field.drainage_system }}</span>
+            </div>
+            <div class="char-item">
+                <span class="label">Topographie</span>
+                <span class="value">{{ field.topography }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recommendations -->
+    <div class="recommendations">
+        <h2>Recommandations</h2>
+        {% for task in field_tasks %}
+        <div class="task-card">
+            <div class="days">{{ task.days_remaining() }} jours</div>
+            <div class="task-info">
+                <h3>{{ task.title }}</h3>
+                <p>Dans {{ task.days_remaining() }} jours</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+.field-details {
+    padding: 20px;
+}
+
+.back-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.back-btn {
+    color: #333;
+    font-size: 1.2em;
+}
+
+.field-image {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.field-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.weather-conditions {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 10px;
+}
+
+.condition {
+    text-align: center;
+}
+
+.condition i {
+    font-size: 1.5em;
+    color: #28a745;
+    margin-bottom: 5px;
+}
+
+.characteristics {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.char-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+}
+
+.char-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.label {
+    color: #666;
+}
+
+.value {
+    color: #28a745;
+    font-weight: 500;
+}
+
+.recommendations {
+    margin-top: 20px;
+}
+
+.task-card {
+    display: flex;
+    align-items: center;
+    background: #fff;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.days {
+    background: #ff6b6b;
+    color: white;
+    padding: 10px;
+    border-radius: 8px;
+    margin-right: 15px;
+    font-weight: bold;
+    min-width: 60px;
+    text-align: center;
+}
+
+.task-info h3 {
+    margin: 0;
+    font-size: 1em;
+    color: #333;
+}
+
+.task-info p {
+    margin: 5px 0 0;
+    font-size: 0.9em;
+    color: #666;
+}
+</style>
+{% endblock %}

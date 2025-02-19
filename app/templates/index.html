@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Accueil - AgriTechPro{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row align-items-center">
+        <div class="col-lg-6">
+            <h1 class="display-4 mb-4">Optimisez votre agriculture avec AgriTechPro</h1>
+            <p class="lead mb-4">Une solution complète pour gérer vos cultures, suivre vos champs et maximiser vos rendements.</p>
+            <div class="d-flex gap-3">
+                <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-lg">Se connecter</a>
+                <a href="{{ url_for('auth.register') }}" class="btn btn-outline-primary btn-lg">S'inscrire</a>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="text-center">
+                <i class="fas fa-leaf fa-5x text-success mb-4"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container py-5" id="features">
+    <h2 class="text-center mb-5">Fonctionnalités principales</h2>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-map-marked-alt fa-3x text-primary mb-3"></i>
+                    <h3 class="h5">Gestion des champs</h3>
+                    <p>Suivez vos champs et cultures en temps réel avec des outils de cartographie avancés.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-cloud-sun fa-3x text-primary mb-3"></i>
+                    <h3 class="h5">Données météo</h3>
+                    <p>Accédez aux prévisions météorologiques précises pour optimiser vos activités agricoles.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-tasks fa-3x text-primary mb-3"></i>
+                    <h3 class="h5">Gestion des tâches</h3>
+                    <p>Planifiez et suivez vos tâches agricoles pour une meilleure organisation.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+.card {
+    transition: transform 0.2s;
+    border-radius: 15px;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.btn {
+    border-radius: 30px;
+    padding: 12px 30px;
+}
+
+.display-4 {
+    font-weight: 600;
+}
+
+.lead {
+    font-size: 1.4rem;
+    color: #666;
+}
+</style>
+{% endblock %}
