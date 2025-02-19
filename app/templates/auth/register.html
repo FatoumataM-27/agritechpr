@@ -23,30 +23,101 @@
                     
                     <form method="POST" action="{{ url_for('auth.register') }}">
                         <div class="mb-3">
-                            <label for="name" class="form-label">Nom complet</label>
-                            <input type="text" class="form-control" id="name" name="name" required>
+                            <label for="username" class="form-label">Nom d'utilisateur</label>
+                            <input type="text" class="form-control" id="username" name="username" 
+                                   required minlength="3" maxlength="64"
+                                   pattern="[a-zA-Z0-9_-]+" 
+                                   title="Le nom d'utilisateur ne doit contenir que des lettres, chiffres, tirets et underscores">
+                            <div class="form-text">
+                                Le nom d'utilisateur doit contenir entre 3 et 64 caractères et ne peut contenir que des lettres, chiffres, tirets et underscores.
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" name="email" required>
+                            <input type="email" class="form-control" id="email" name="email" 
+                                   required maxlength="120">
+                            <div class="form-text">
+                                Nous ne partagerons jamais votre email avec des tiers.
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label for="password" class="form-label">Mot de passe</label>
-                            <input type="password" class="form-control" id="password" name="password" required>
+                            <input type="password" class="form-control" id="password" name="password" 
+                                   required minlength="6" maxlength="128">
+                            <div class="form-text">
+                                Le mot de passe doit contenir au moins 6 caractères.
+                            </div>
                         </div>
-                        <div class="d-grid">
+                        <div class="mb-3">
+                            <label for="region" class="form-label">Région</label>
+                            <select class="form-select" id="region" name="region" required>
+                                <option value="">Sélectionnez une région</option>
+                                <option value="Dakar">Dakar</option>
+                                <option value="Diourbel">Diourbel</option>
+                                <option value="Fatick">Fatick</option>
+                                <option value="Kaffrine">Kaffrine</option>
+                                <option value="Kaolack">Kaolack</option>
+                                <option value="Kédougou">Kédougou</option>
+                                <option value="Kolda">Kolda</option>
+                                <option value="Louga">Louga</option>
+                                <option value="Matam">Matam</option>
+                                <option value="Saint-Louis">Saint-Louis</option>
+                                <option value="Sédhiou">Sédhiou</option>
+                                <option value="Tambacounda">Tambacounda</option>
+                                <option value="Thiès">Thiès</option>
+                                <option value="Ziguinchor">Ziguinchor</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="ville" class="form-label">Ville</label>
+                            <input type="text" class="form-control" id="ville" name="ville" 
+                                   required maxlength="50">
+                            <div class="form-text">
+                                Entrez le nom de votre ville ou village.
+                            </div>
+                        </div>
+                        <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-primary">S'inscrire</button>
+                            <a href="{{ url_for('auth.login') }}" class="btn btn-outline-secondary">Déjà inscrit? Se connecter</a>
                         </div>
                     </form>
-                    
-                    <div class="text-center mt-3">
-                        <p>Déjà inscrit? <a href="{{ url_for('auth.login') }}">Se connecter</a></p>
-                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Script pour charger les villes en fonction de la région -->
+<script>
+document.getElementById('region').addEventListener('change', function() {
+    const region = this.value;
+    const villeInput = document.getElementById('ville');
+    villeInput.value = ''; // Réinitialiser la ville
+    
+    if (region === 'Kolda') {
+        // Suggestions pour la région de Kolda
+        const datalist = document.createElement('datalist');
+        datalist.id = 'villes-suggestions';
+        const villes = ['Vélingara', 'Médina Yoro Foulah', 'Dabo', 'Salikégné', 'Kounkané'];
+        villes.forEach(ville => {
+            const option = document.createElement('option');
+            option.value = ville;
+            datalist.appendChild(option);
+        });
+        
+        // Ajouter la liste de suggestions
+        document.body.appendChild(datalist);
+        villeInput.setAttribute('list', 'villes-suggestions');
+    } else {
+        // Retirer la liste de suggestions si elle existe
+        villeInput.removeAttribute('list');
+        const existingDatalist = document.getElementById('villes-suggestions');
+        if (existingDatalist) {
+            existingDatalist.remove();
+        }
+    }
+});
+</script>
 {% endblock %}
 
 {% block styles %}

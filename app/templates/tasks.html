@@ -53,25 +53,34 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <form id="addTaskForm">
+                <form id="addTaskForm" method="POST" action="{{ url_for('main.add_task') }}">
                     <div class="mb-3">
                         <label class="form-label">Titre de la tâche</label>
-                        <input type="text" class="form-control" required>
+                        <input type="text" class="form-control" name="title" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Champ concerné</label>
-                        <select class="form-control">
-                            <option value="rice">Champ de Riz</option>
-                            <option value="potato">Champ de Pommes de terre</option>
+                        <select class="form-control" name="field_id" required>
+                            {% for field in fields %}
+                                <option value="{{ field.id }}">{{ field.name }}</option>
+                            {% endfor %}
                         </select>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Date d'échéance</label>
-                        <input type="date" class="form-control" required>
+                        <input type="date" class="form-control" name="due_date" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Description</label>
-                        <textarea class="form-control" rows="3"></textarea>
+                        <textarea class="form-control" name="description" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Priorité</label>
+                        <select class="form-control" name="priority">
+                            <option value="basse">Basse</option>
+                            <option value="moyenne" selected>Moyenne</option>
+                            <option value="haute">Haute</option>
+                        </select>
                     </div>
                 </form>
             </div>

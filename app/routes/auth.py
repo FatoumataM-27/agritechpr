@@ -3,6 +3,7 @@ from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.models.user import User
 from app import db
+from app.utils.logger import log_info, log_error
 
 auth = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -18,11 +19,12 @@ def login():
 
         user = User.query.filter_by(email=email).first()
 
-        if not user or not check_password_hash(user.password, password):
+        if not user or not user.check_password(password):
             flash('Veuillez vérifier vos identifiants et réessayer.')
             return redirect(url_for('auth.login'))
 
         login_user(user, remember=remember)
+        log_info(None, f"Connexion réussie pour {user.email}")
         next_page = request.args.get('next')
         return redirect(next_page if next_page else url_for('main.dashboard'))
 
@@ -34,44 +36,69 @@ def register():
         return redirect(url_for('main.dashboard'))
         
     if request.method == 'POST':
-        email = request.form.get('email')
-        name = request.form.get('name')
-        password = request.form.get('password')
-
-        # Vérification des champs requis
-        if not email or not name or not password:
-            flash('Tous les champs sont requis.')
-            return redirect(url_for('auth.register'))
-
-        # Vérification si l'email existe déjà
-        user = User.query.filter_by(email=email).first()
-        if user:
-            flash('Cet email est déjà enregistré')
-            return redirect(url_for('auth.register'))
-
-        # Création du nouvel utilisateur
         try:
+            email = request.form.get('email')
+            username = request.form.get('username')
+            password = request.form.get('password')
+            region = request.form.get('region')
+            ville = request.form.get('ville')
+
+            # Vérification des champs requis
+            if not email or not username or not password or not region or not ville:
+                flash('Tous les champs sont requis.')
+                return redirect(url_for('auth.register'))
+
+            # Vérification de la longueur du mot de passe
+            if len(password) < 6:
+                flash('Le mot de passe doit contenir au moins 6 caractères.')
+                return redirect(url_for('auth.register'))
+
+            # Vérification si l'email existe déjà
+            if User.query.filter_by(email=email).first():
+                flash('Cet email est déjà enregistré.')
+                return redirect(url_for('auth.register'))
+
+            # Vérification si le nom d'utilisateur existe déjà
+            if User.query.filter_by(username=username).first():
+                flash('Ce nom d\'utilisateur est déjà pris.')
+                return redirect(url_for('auth.register'))
+
+            # Création du nouvel utilisateur
             new_user = User(
                 email=email,
-                name=name,
-                password=generate_password_hash(password, method='pbkdf2:sha256')
+                username=username,
+                region=region,
+                ville=ville
             )
+            new_user.set_password(password)
+
+            # Ajout à la base de données
             db.session.add(new_user)
             db.session.commit()
-            
-            # Connexion automatique après inscription
+
+            # Connecter automatiquement l'utilisateur après l'inscription
             login_user(new_user)
+            
+            log_info(None, f"Nouvel utilisateur inscrit : {email} ({region}, {ville})")
+            flash('Inscription réussie ! Bienvenue sur votre tableau de bord.')
             return redirect(url_for('main.dashboard'))
+
         except Exception as e:
+            log_error(None, f"Erreur lors de l'inscription : {str(e)}")
             db.session.rollback()
             flash('Une erreur est survenue lors de l\'inscription. Veuillez réessayer.')
-            print(f"Erreur d'inscription: {str(e)}")
             return redirect(url_for('auth.register'))
 
     return render_template('auth/register.html')
+
+@auth.route('/profile')
+@login_required
+def profile():
+    return render_template('auth/profile.html')
 
 @auth.route('/logout')
 @login_required
 def logout():
     logout_user()
+    flash('Vous avez été déconnecté.')
     return redirect(url_for('main.index'))

@@ -10,16 +10,16 @@
             <div class="d-flex justify-content-between align-items-center mb-2">
                 <div>
                     <small>Bonjour ☀️</small>
-                    <h5 class="mb-0">{{ user.name }}</h5>
+                    <h5 class="mb-0">{{ user.username }}</h5>
                 </div>
                 <div>
                     <i class="fas fa-bell fs-4"></i>
                 </div>
             </div>
-            <h2 class="mb-2">Kolda</h2>
+            <h2 class="mb-2">{{ user.region }}</h2>
             <div class="d-flex align-items-center">
                 <i class="fas fa-map-marker-alt me-2"></i>
-                <span>Vélingara</span>
+                <span>{{ user.ville }}</span>
             </div>
             <div class="d-flex align-items-center mt-2">
                 <h3 class="mb-0">{{ weather.temperature }}°C</h3>
@@ -57,7 +57,7 @@
                     <div class="card">
                         <div class="card-body text-center py-4">
                             <p class="mb-0">Vous n'avez pas encore de champs</p>
-                            <a href="{{ url_for('main.fields') }}" class="btn btn-success mt-2">
+                            <a href="{{ url_for('main.add_field') }}" class="btn btn-success mt-2">
                                 Ajouter un champ
                             </a>
                         </div>
@@ -71,7 +71,7 @@
     <div class="mb-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h5 class="mb-0">Tâches</h5>
-            <a href="#" class="btn btn-sm btn-outline-success">
+            <a href="{{ url_for('main.tasks') }}" class="btn btn-sm btn-outline-success">
                 Voir toutes
             </a>
         </div>
@@ -114,7 +114,7 @@
                 </a>
             </div>
             <div class="col">
-                <a href="#" class="text-muted text-decoration-none">
+                <a href="{{ url_for('main.tasks') }}" class="text-muted text-decoration-none">
                     <i class="fas fa-tasks d-block mb-1"></i>
                     <small>Tâches</small>
                 </a>

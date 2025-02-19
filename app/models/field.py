@@ -12,7 +12,7 @@ class Field(db.Model):
     topography = db.Column(db.String(50), default='plat')
     image_path = db.Column(db.String(255))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     
     # Relations
     tasks = db.relationship('Task', backref='field', lazy=True)

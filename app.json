@@ -1,0 +1,31 @@
+{
+  "name": "AgriTechPro",
+  "description": "Plateforme de gestion agricole pour les agriculteurs sénégalais",
+  "repository": "https://github.com/votre-username/agritechpro",
+  "keywords": ["python", "flask", "agriculture", "senegal"],
+  "addons": [
+    "heroku-postgresql:hobby-dev"
+  ],
+  "buildpacks": [
+    {
+      "url": "heroku/python"
+    }
+  ],
+  "env": {
+    "SECRET_KEY": {
+      "description": "Une clé secrète pour sécuriser l'application",
+      "generator": "secret"
+    },
+    "FLASK_APP": {
+      "description": "Configuration Flask",
+      "value": "run.py"
+    },
+    "FLASK_ENV": {
+      "description": "Environnement Flask",
+      "value": "production"
+    }
+  },
+  "scripts": {
+    "postdeploy": "python -c 'from app import db; db.create_all()'"
+  }
+}

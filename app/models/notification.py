@@ -2,19 +2,27 @@ from app import db
 from datetime import datetime
 
 class Notification(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    message = db.Column(db.String(255), nullable=False)
-    type = db.Column(db.String(50), default='info')  # info, warning, alert
-    read = db.Column(db.Boolean, default=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    """Modèle pour les notifications"""
+    __tablename__ = 'notifications'
     
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'message': self.message,
-            'type': self.type,
-            'read': self.read,
-            'created_at': self.created_at.strftime('%H:%M'),
-            'time': self.created_at.strftime('%H:%M')
-        }
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    type = db.Column(db.String(20), default='info')  # info, warning, alert
+    read = db.Column(db.Boolean, default=False)
+    
+    # Clé étrangère vers l'utilisateur
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    
+    # Métadonnées
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    read_at = db.Column(db.DateTime)
+    
+    def __repr__(self):
+        return f'<Notification {self.title}>'
+        
+    def mark_as_read(self):
+        """Marque la notification comme lue"""
+        self.read = True
+        self.read_at = datetime.utcnow()
+        db.session.commit()

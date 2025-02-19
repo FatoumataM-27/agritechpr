@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Ajouter un champ - AgriTechPro{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex align-items-center">
+            <a href="{{ url_for('main.fields') }}" class="text-dark me-3">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <h5 class="mb-0">Ajouter un champ</h5>
+        </div>
+    </div>
+
+    <!-- Formulaire -->
+    <div class="card">
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('main.add_field') }}">
+                <div class="mb-3">
+                    <label for="name" class="form-label">Nom du champ</label>
+                    <input type="text" class="form-control" id="name" name="name" required>
+                    <div class="form-text">Donnez un nom unique à votre champ</div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="size" class="form-label">Taille (hectares)</label>
+                    <input type="number" step="0.01" class="form-control" id="size" name="size" required>
+                    <div class="form-text">Entrez la taille en hectares (ex: 1.5)</div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="crop_type" class="form-label">Type de culture</label>
+                    <select class="form-select" id="crop_type" name="crop_type" required>
+                        <option value="">Sélectionnez un type</option>
+                        <option value="Riz">Riz</option>
+                        <option value="Maïs">Maïs</option>
+                        <option value="Mil">Mil</option>
+                        <option value="Sorgho">Sorgho</option>
+                        <option value="Arachide">Arachide</option>
+                        <option value="Niébé">Niébé</option>
+                        <option value="Manioc">Manioc</option>
+                        <option value="Patate douce">Patate douce</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="soil_type" class="form-label">Type de sol</label>
+                    <select class="form-select" id="soil_type" name="soil_type">
+                        <option value="limoneux">Limoneux</option>
+                        <option value="argileux">Argileux</option>
+                        <option value="sableux">Sableux</option>
+                        <option value="argilo-limoneux">Argilo-limoneux</option>
+                        <option value="sablo-limoneux">Sablo-limoneux</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="irrigation_system" class="form-label">Système d'irrigation</label>
+                    <select class="form-select" id="irrigation_system" name="irrigation_system">
+                        <option value="non disponible">Non disponible</option>
+                        <option value="goutte-à-goutte">Goutte-à-goutte</option>
+                        <option value="aspersion">Aspersion</option>
+                        <option value="gravitaire">Gravitaire</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="drainage_system" class="form-label">Système de drainage</label>
+                    <select class="form-select" id="drainage_system" name="drainage_system">
+                        <option value="non disponible">Non disponible</option>
+                        <option value="surface">Surface</option>
+                        <option value="souterrain">Souterrain</option>
+                        <option value="mixte">Mixte</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="topography" class="form-label">Topographie</label>
+                    <select class="form-select" id="topography" name="topography">
+                        <option value="plat">Plat</option>
+                        <option value="légère pente">Légère pente</option>
+                        <option value="pente moyenne">Pente moyenne</option>
+                        <option value="forte pente">Forte pente</option>
+                    </select>
+                </div>
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-success">Ajouter le champ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -5,9 +5,37 @@ Flask-Migrate==4.0.4
 Flask-WTF==1.1.1
 Werkzeug==2.3.7
 SQLAlchemy==2.0.20
-python-dotenv==1.0.0
 email-validator==2.0.0
 Flask-RESTful==0.3.10
+flask-swagger-ui==4.11.1
 pytest==7.4.2
 black==23.7.0
 flake8==6.1.0
+gunicorn==21.2.0
+psycopg2-binary==2.9.7
+
+# Celery et dépendances
+celery==5.3.6
+redis==5.0.1
+flower==2.0.1
+
+# Monitoring et métriques
+influxdb-client==1.36.1
+psutil==5.9.8
+prometheus-client==0.19.0
+
+# Génération de rapports
+WeasyPrint==60.1
+Jinja2==3.1.3
+reportlab==4.0.4
+
+# Intégrations
+slack-sdk==3.26.1
+requests==2.31.0
+pywebpush==1.14.0
+
+# Autres dépendances
+scikit-learn==1.2.2
+pandas==2.0.3
+grafana-api==1.0.3
+python-dotenv==1.0.0

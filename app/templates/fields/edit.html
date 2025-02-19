@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Modifier {{ field.name }} - AgriTechPro{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex align-items-center">
+            <a href="{{ url_for('main.field_details', field_id=field.id) }}" class="text-dark me-3">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <h5 class="mb-0">Modifier {{ field.name }}</h5>
+        </div>
+    </div>
+
+    <!-- Formulaire -->
+    <div class="card">
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('main.edit_field', field_id=field.id) }}">
+                <div class="mb-3">
+                    <label for="name" class="form-label">Nom du champ</label>
+                    <input type="text" class="form-control" id="name" name="name" value="{{ field.name }}" required>
+                    <div class="form-text">Donnez un nom unique à votre champ</div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="size" class="form-label">Taille (hectares)</label>
+                    <input type="number" step="0.01" class="form-control" id="size" name="size" value="{{ field.size }}" required>
+                    <div class="form-text">Entrez la taille en hectares (ex: 1.5)</div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="crop_type" class="form-label">Type de culture</label>
+                    <select class="form-select" id="crop_type" name="crop_type" required>
+                        <option value="">Sélectionnez un type</option>
+                        {% for type in ['Riz', 'Maïs', 'Mil', 'Sorgho', 'Arachide', 'Niébé', 'Manioc', 'Patate douce'] %}
+                            <option value="{{ type }}" {% if field.crop_type == type %}selected{% endif %}>{{ type }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="soil_type" class="form-label">Type de sol</label>
+                    <select class="form-select" id="soil_type" name="soil_type">
+                        {% for type in ['limoneux', 'argileux', 'sableux', 'argilo-limoneux', 'sablo-limoneux'] %}
+                            <option value="{{ type }}" {% if field.soil_type == type %}selected{% endif %}>{{ type|title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="irrigation_system" class="form-label">Système d'irrigation</label>
+                    <select class="form-select" id="irrigation_system" name="irrigation_system">
+                        {% for system in ['non disponible', 'goutte-à-goutte', 'aspersion', 'gravitaire'] %}
+                            <option value="{{ system }}" {% if field.irrigation_system == system %}selected{% endif %}>{{ system|title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="drainage_system" class="form-label">Système de drainage</label>
+                    <select class="form-select" id="drainage_system" name="drainage_system">
+                        {% for system in ['non disponible', 'surface', 'souterrain', 'mixte'] %}
+                            <option value="{{ system }}" {% if field.drainage_system == system %}selected{% endif %}>{{ system|title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="topography" class="form-label">Topographie</label>
+                    <select class="form-select" id="topography" name="topography">
+                        {% for topo in ['plat', 'légère pente', 'pente moyenne', 'forte pente'] %}
+                            <option value="{{ topo }}" {% if field.topography == topo %}selected{% endif %}>{{ topo|title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-success">Enregistrer les modifications</button>
+                    <a href="{{ url_for('main.field_details', field_id=field.id) }}" class="btn btn-outline-secondary">Annuler</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

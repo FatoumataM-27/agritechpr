@@ -1,0 +1,428 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Tableau de bord principal -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">Tableau de Bord de Monitoring</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Métriques système -->
+                        <div class="col-md-4">
+                            <div class="metric-card">
+                                <h6>CPU</h6>
+                                <div class="chart-container">
+                                    <canvas id="cpuChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="metric-card">
+                                <h6>Mémoire</h6>
+                                <div class="chart-container">
+                                    <canvas id="memoryChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="metric-card">
+                                <h6>Disque</h6>
+                                <div class="chart-container">
+                                    <canvas id="diskChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rapports programmés -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">Rapports Programmés</h5>
+                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#newReportModal">
+                            <i class="fas fa-plus"></i> Nouveau Rapport
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table" id="reportsTable">
+                            <thead>
+                                <tr>
+                                    <th>Nom</th>
+                                    <th>Fréquence</th>
+                                    <th>Format</th>
+                                    <th>Dernière exécution</th>
+                                    <th>Statut</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reportsTableBody">
+                                <!-- Rempli dynamiquement par JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alertes -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">Configuration des Alertes</h5>
+                        <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#newAlertModal">
+                            <i class="fas fa-bell"></i> Nouvelle Alerte
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table" id="alertsTable">
+                            <thead>
+                                <tr>
+                                    <th>Métrique</th>
+                                    <th>Seuil</th>
+                                    <th>Condition</th>
+                                    <th>Sévérité</th>
+                                    <th>Notification</th>
+                                    <th>Statut</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="alertsTableBody">
+                                <!-- Rempli dynamiquement par JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Nouveau Rapport -->
+<div class="modal fade" id="newReportModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Nouveau Rapport Programmé</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="newReportForm">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Nom du rapport</label>
+                            <input type="text" class="form-control" name="name" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Fréquence</label>
+                            <select class="form-select" name="frequency" required>
+                                <option value="daily">Quotidien</option>
+                                <option value="weekly">Hebdomadaire</option>
+                                <option value="monthly">Mensuel</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Format</label>
+                            <select class="form-select" name="format" required>
+                                <option value="pdf">PDF</option>
+                                <option value="csv">CSV</option>
+                                <option value="both">Les deux</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Notification</label>
+                            <select class="form-select" name="notification_method" required>
+                                <option value="email">Email</option>
+                                <option value="slack">Slack</option>
+                                <option value="teams">Teams</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Métriques à inclure</label>
+                        <div class="metrics-selector">
+                            <!-- Rempli dynamiquement par JavaScript -->
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary" id="saveReportBtn">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Nouvelle Alerte -->
+<div class="modal fade" id="newAlertModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Nouvelle Alerte</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="newAlertForm">
+                    <div class="mb-3">
+                        <label class="form-label">Métrique</label>
+                        <select class="form-select" name="metric" required>
+                            <option value="cpu_percent">CPU (%)</option>
+                            <option value="memory_percent">Mémoire (%)</option>
+                            <option value="disk_percent">Disque (%)</option>
+                            <option value="active_users">Utilisateurs actifs</option>
+                            <option value="pending_tasks">Tâches en attente</option>
+                        </select>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Seuil</label>
+                            <input type="number" class="form-control" name="threshold" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Condition</label>
+                            <select class="form-select" name="comparison" required>
+                                <option value=">">&gt;</option>
+                                <option value=">=">&gt;=</option>
+                                <option value="<">&lt;</option>
+                                <option value="<=">&lt;=</option>
+                                <option value="==">==</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Sévérité</label>
+                        <select class="form-select" name="severity" required>
+                            <option value="info">Info</option>
+                            <option value="warning">Warning</option>
+                            <option value="critical">Critical</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary" id="saveAlertBtn">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Configuration des graphiques
+const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+        legend: {
+            display: false
+        }
+    }
+};
+
+// Initialisation des graphiques
+const cpuChart = new Chart(document.getElementById('cpuChart'), {
+    type: 'line',
+    data: {
+        labels: [],
+        datasets: [{
+            data: [],
+            borderColor: '#2ECC71',
+            tension: 0.4
+        }]
+    },
+    options: chartOptions
+});
+
+const memoryChart = new Chart(document.getElementById('memoryChart'), {
+    type: 'line',
+    data: {
+        labels: [],
+        datasets: [{
+            data: [],
+            borderColor: '#3498DB',
+            tension: 0.4
+        }]
+    },
+    options: chartOptions
+});
+
+const diskChart = new Chart(document.getElementById('diskChart'), {
+    type: 'line',
+    data: {
+        labels: [],
+        datasets: [{
+            data: [],
+            borderColor: '#E74C3C',
+            tension: 0.4
+        }]
+    },
+    options: chartOptions
+});
+
+// Mise à jour des métriques en temps réel
+function updateMetrics() {
+    fetch('/api/metrics')
+        .then(response => response.json())
+        .then(data => {
+            const timestamp = new Date().toLocaleTimeString();
+            
+            // Mise à jour CPU
+            cpuChart.data.labels.push(timestamp);
+            cpuChart.data.datasets[0].data.push(data.cpu_percent);
+            if (cpuChart.data.labels.length > 10) {
+                cpuChart.data.labels.shift();
+                cpuChart.data.datasets[0].data.shift();
+            }
+            cpuChart.update();
+            
+            // Mise à jour Mémoire
+            memoryChart.data.labels.push(timestamp);
+            memoryChart.data.datasets[0].data.push(data.memory_percent);
+            if (memoryChart.data.labels.length > 10) {
+                memoryChart.data.labels.shift();
+                memoryChart.data.datasets[0].data.shift();
+            }
+            memoryChart.update();
+            
+            // Mise à jour Disque
+            diskChart.data.labels.push(timestamp);
+            diskChart.data.datasets[0].data.push(data.disk_percent);
+            if (diskChart.data.labels.length > 10) {
+                diskChart.data.labels.shift();
+                diskChart.data.datasets[0].data.shift();
+            }
+            diskChart.update();
+        });
+}
+
+// Mise à jour toutes les 5 secondes
+setInterval(updateMetrics, 5000);
+updateMetrics(); // Première mise à jour
+
+// Gestion des rapports programmés
+function loadReports() {
+    fetch('/api/schedules')
+        .then(response => response.json())
+        .then(data => {
+            const tbody = document.getElementById('reportsTableBody');
+            tbody.innerHTML = '';
+            
+            data.forEach(report => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${report.name}</td>
+                    <td>${report.frequency}</td>
+                    <td>${report.format}</td>
+                    <td>${report.last_run || 'Jamais'}</td>
+                    <td><span class="badge ${report.enabled ? 'bg-success' : 'bg-danger'}">${report.enabled ? 'Actif' : 'Inactif'}</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" onclick="editReport(${report.id})"><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteReport(${report.id})"><i class="fas fa-trash"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        });
+}
+
+// Gestion des alertes
+function loadAlerts() {
+    fetch('/api/alerts')
+        .then(response => response.json())
+        .then(data => {
+            const tbody = document.getElementById('alertsTableBody');
+            tbody.innerHTML = '';
+            
+            data.forEach(alert => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${alert.metric}</td>
+                    <td>${alert.threshold}</td>
+                    <td>${alert.comparison}</td>
+                    <td><span class="badge bg-${alert.severity}">${alert.severity}</span></td>
+                    <td>${alert.notification_method}</td>
+                    <td><span class="badge ${alert.enabled ? 'bg-success' : 'bg-danger'}">${alert.enabled ? 'Actif' : 'Inactif'}</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" onclick="editAlert(${alert.id})"><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteAlert(${alert.id})"><i class="fas fa-trash"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        });
+}
+
+// Chargement initial
+loadReports();
+loadAlerts();
+
+// Sauvegarde d'un nouveau rapport
+document.getElementById('saveReportBtn').addEventListener('click', function() {
+    const form = document.getElementById('newReportForm');
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData);
+    
+    fetch('/api/schedules', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.id) {
+            $('#newReportModal').modal('hide');
+            loadReports();
+            form.reset();
+        }
+    });
+});
+
+// Sauvegarde d'une nouvelle alerte
+document.getElementById('saveAlertBtn').addEventListener('click', function() {
+    const form = document.getElementById('newAlertForm');
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData);
+    
+    fetch('/api/alerts', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.id) {
+            $('#newAlertModal').modal('hide');
+            loadAlerts();
+            form.reset();
+        }
+    });
+});
+</script>
+{% endblock %}
