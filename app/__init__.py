@@ -7,12 +7,14 @@ from config import Config
 from app.utils.logger import setup_logger
 from app.swagger import template
 import os
+from apscheduler.schedulers.background import BackgroundScheduler
 
 db = SQLAlchemy()
 migrate = Migrate()
 login_manager = LoginManager()
 login_manager.login_view = 'auth.login'
 login_manager.login_message = 'Veuillez vous connecter pour accéder à cette page.'
+login_manager.login_message_category = 'info'
 
 def create_app(config_class=Config):
     app = Flask(__name__)
@@ -43,6 +45,12 @@ def create_app(config_class=Config):
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(int(user_id))
+
+    # Initialisation du planificateur de tâches
+    scheduler = BackgroundScheduler()
+    from app.models.task import Task
+    scheduler.add_job(Task.check_upcoming_tasks, 'interval', hours=24)
+    scheduler.start()
 
     # Enregistrement des blueprints
     from app.routes.auth import auth

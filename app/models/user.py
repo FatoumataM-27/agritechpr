@@ -7,19 +7,19 @@ class User(UserMixin, db.Model):
     __tablename__ = 'users'
     
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(64), unique=True, nullable=False)
+    username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(128))
     role = db.Column(db.String(20), default='user')  # 'admin' ou 'user'
-    region = db.Column(db.String(50))
-    ville = db.Column(db.String(50))
+    region = db.Column(db.String(80))
+    ville = db.Column(db.String(80))
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
     
     # Relations
-    tasks = db.relationship('Task', backref='user', lazy='dynamic')
-    fields = db.relationship('Field', backref='user', lazy='dynamic')
+    tasks = db.relationship('Task', backref='user', lazy=True)
+    fields = db.relationship('Field', backref='user', lazy=True)
     notifications = db.relationship('Notification', backref='user', lazy='dynamic')
     alert_configs = db.relationship('AlertConfig', backref='user', lazy='dynamic')
     report_schedules = db.relationship('ReportSchedule', backref='user', lazy='dynamic')

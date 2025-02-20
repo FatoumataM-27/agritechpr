@@ -1,20 +1,27 @@
-from flask import Blueprint, render_template, jsonify, request, flash, redirect, url_for
+from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
 from flask_login import login_required, current_user
 from app import db
+from app.models.user import User
 from app.models.field import Field
 from app.models.task import Task
 from app.models.notification import Notification
 from app.models.weather_data import WeatherData
-from app.models.field_growth import FieldGrowth
+import logging
 from datetime import datetime, timedelta
 
 main = Blueprint('main', __name__)
 
+@main.context_processor
+def utility_processor():
+    def get_notification_model():
+        return Notification
+    return dict(get_notification_model=get_notification_model)
+
 @main.route('/')
 def index():
-    if current_user.is_authenticated:
-        return redirect(url_for('main.dashboard'))
-    return render_template('index.html')
+    if not current_user.is_authenticated:
+        return redirect(url_for('auth.login'))
+    return redirect(url_for('main.dashboard'))
 
 @main.route('/dashboard')
 @login_required
@@ -28,36 +35,17 @@ def dashboard():
             Task.user_id == current_user.id,
             Task.status != 'terminée'
         ).order_by(Task.due_date).limit(5).all()
-
-        # Récupérer les données météo les plus récentes
-        weather_data = WeatherData.query.filter_by(city='Vélingara').order_by(WeatherData.timestamp.desc()).first()
-
-        # Initialiser les valeurs par défaut si weather_data est None
-        weather = {
-            'temperature': 30,
-            'humidity': 60,
-            'precipitation_probability': 60,
-            'wind_speed': 10,
-            'solar_radiation': 800
-        }
-
-        if weather_data:
-            weather.update({
-                'temperature': weather_data.temperature,
-                'humidity': weather_data.humidity,
-                'precipitation_probability': weather_data.precipitation_probability,
-                'wind_speed': weather_data.wind_speed,
-                'solar_radiation': weather_data.solar_radiation
-            })
-
+        
+        # Récupérer les données météo
+        weather = WeatherData.query.filter_by(region=current_user.region).order_by(WeatherData.timestamp.desc()).first()
+        
         return render_template('dashboard.html',
-                             user=current_user,
-                             fields=fields,
-                             tasks=tasks,
-                             weather=weather)
-                             
+            fields=fields,
+            tasks=tasks,
+            weather=weather
+        )
     except Exception as e:
-        flash('Une erreur est survenue lors du chargement du tableau de bord.', 'error')
+        logging.error(f"Erreur dans la route dashboard: {str(e)}")
         return redirect(url_for('main.index'))
 
 @main.route('/fields')
@@ -67,6 +55,7 @@ def fields():
         fields = Field.query.filter_by(user_id=current_user.id).all()
         return render_template('fields.html', fields=fields)
     except Exception as e:
+        logging.error(f"Erreur dans la route fields: {str(e)}")
         flash('Une erreur est survenue lors du chargement des champs.', 'error')
         return redirect(url_for('main.dashboard'))
 
@@ -108,6 +97,7 @@ def add_field():
         flash('Champ ajouté avec succès!', 'success')
         
     except Exception as e:
+        logging.error(f"Erreur dans la route add_field: {str(e)}")
         db.session.rollback()
         flash('Une erreur est survenue lors de l\'ajout du champ', 'error')
     
@@ -163,6 +153,7 @@ def field_details(field_id):
                              today=datetime.utcnow())
                              
     except Exception as e:
+        logging.error(f"Erreur dans la route field_details: {str(e)}")
         flash('Une erreur est survenue lors du chargement des détails du champ.', 'error')
         return redirect(url_for('main.fields'))
 
@@ -235,6 +226,7 @@ def edit_field(field_id):
             return redirect(url_for('main.field_details', field_id=field.id))
             
         except Exception as e:
+            logging.error(f"Erreur dans la route edit_field: {str(e)}")
             db.session.rollback()
             flash('Une erreur est survenue lors de la mise à jour du champ', 'error')
             return redirect(url_for('main.edit_field', field_id=field.id))
@@ -257,6 +249,7 @@ def tasks():
         
         return render_template('tasks.html', tasks=tasks, fields=fields)
     except Exception as e:
+        logging.error(f"Erreur dans la route tasks: {str(e)}")
         flash('Une erreur est survenue lors du chargement des tâches.', 'error')
         return redirect(url_for('main.dashboard'))
 
@@ -293,9 +286,21 @@ def add_task():
         
         db.session.add(task)
         db.session.commit()
+        
+        # Créer une notification pour la nouvelle tâche
+        notification = Notification(
+            title="Nouvelle tâche créée",
+            message=f"La tâche '{title}' a été créée pour le champ '{field.name}'. Date d'échéance : {due_date}",
+            type="info",
+            user_id=current_user.id
+        )
+        db.session.add(notification)
+        db.session.commit()
+        
         flash('Tâche ajoutée avec succès!', 'success')
         
     except Exception as e:
+        logging.error(f"Erreur dans la route add_task: {str(e)}")
         db.session.rollback()
         flash(f'Une erreur est survenue lors de l\'ajout de la tâche: {str(e)}', 'error')
     
@@ -314,19 +319,45 @@ def complete_task(task_id):
 @main.route('/data')
 @login_required
 def data():
-    region = request.args.get('region', 'Tambacounda')
-    weather_data = {
-        'temperature': 32,
-        'humidity': 65,
-        'wind_speed': 12,
-        'precipitation': 0,
-        'forecast': [
-            {'day': 'Lundi', 'temp': 31, 'condition': 'Ensoleillé'},
-            {'day': 'Mardi', 'temp': 33, 'condition': 'Partiellement nuageux'},
-            {'day': 'Mercredi', 'temp': 30, 'condition': 'Risque de pluie'}
-        ]
-    }
-    return render_template('data.html', region=weather_data)
+    try:
+        region = request.args.get('region', current_user.region)
+        weather_data = WeatherData.query.filter_by(region=region).order_by(WeatherData.timestamp.desc()).first()
+        
+        # Si pas de données météo, utiliser des valeurs par défaut
+        if not weather_data:
+            weather_data = {
+                'temperature': 32,
+                'humidity': 65,
+                'wind_speed': 12,
+                'precipitation': 0,
+                'forecast': [
+                    {'day': 'Lundi', 'temp': 31, 'condition': 'Ensoleillé'},
+                    {'day': 'Mardi', 'temp': 33, 'condition': 'Partiellement nuageux'},
+                    {'day': 'Mercredi', 'temp': 30, 'condition': 'Risque de pluie'}
+                ]
+            }
+        else:
+            # Convertir l'objet WeatherData en dictionnaire
+            weather_data = {
+                'temperature': weather_data.temperature,
+                'humidity': weather_data.humidity,
+                'wind_speed': weather_data.wind_speed,
+                'precipitation': weather_data.precipitation_probability,
+                'forecast': [
+                    {'day': 'Lundi', 'temp': round(weather_data.temperature - 1), 'condition': 'Ensoleillé'},
+                    {'day': 'Mardi', 'temp': round(weather_data.temperature + 1), 'condition': 'Partiellement nuageux'},
+                    {'day': 'Mercredi', 'temp': round(weather_data.temperature - 2), 'condition': 'Risque de pluie'}
+                ]
+            }
+        
+        return render_template('data.html', 
+                             region=region,
+                             weather=weather_data)
+                             
+    except Exception as e:
+        logging.error(f"Erreur dans la route data: {str(e)}")
+        flash('Une erreur est survenue lors du chargement des données.', 'error')
+        return redirect(url_for('main.dashboard'))
 
 @main.route('/api/weather')
 @login_required
@@ -340,25 +371,29 @@ def get_weather():
         'precipitation_probability': 60
     })
 
-@main.route('/api/notifications')
+@main.route('/notifications')
 @login_required
 def get_notifications():
-    notifications = Notification.query.filter_by(
-        user_id=current_user.id
-    ).order_by(Notification.created_at.desc()).all()
-    return jsonify([n.to_dict() for n in notifications])
+    notifications = Notification.query.filter_by(user_id=current_user.id, read=False).order_by(Notification.created_at.desc()).all()
+    return jsonify([{
+        'id': n.id,
+        'message': n.message,
+        'created_at': n.created_at.strftime('%Y-%m-%d %H:%M:%S')
+    } for n in notifications])
 
-@main.route('/api/notifications/read', methods=['POST'])
+@main.route('/notifications/mark-read')
 @login_required
 def mark_notifications_read():
-    notification_ids = request.json.get('notification_ids', [])
-    if notification_ids:
-        Notification.query.filter(
-            Notification.id.in_(notification_ids),
-            Notification.user_id == current_user.id
-        ).update({Notification.read: True}, synchronize_session=False)
+    try:
+        notifications = Notification.query.filter_by(user_id=current_user.id, read=False).all()
+        for notification in notifications:
+            notification.read = True
         db.session.commit()
-    return jsonify({'success': True})
+        flash('Toutes les notifications ont été marquées comme lues.', 'success')
+    except Exception as e:
+        logging.error(f"Erreur lors du marquage des notifications: {str(e)}")
+        flash('Une erreur est survenue.', 'error')
+    return redirect(url_for('main.dashboard'))
 
 @main.route('/support')
 def support():
