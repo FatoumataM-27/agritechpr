@@ -84,6 +84,83 @@ class Config:
     PDF_EXPORT_DIR = os.path.join(basedir, 'exports', 'pdf')
     CSV_EXPORT_DIR = os.path.join(basedir, 'exports', 'csv')
     
+    # Configuration OpenWeatherMap
+    OPENWEATHER_API_KEY = os.environ.get('OPENWEATHER_API_KEY')
+    
+    # Coordonnées des régions du Sénégal avec données supplémentaires
+    REGIONS_COORDINATES = {
+        'Dakar': {
+            'lat': 14.7167, 
+            'lon': -17.4677,
+            'description': 'Capitale du Sénégal'
+        },
+        'Saint-Louis': {
+            'lat': 16.0179, 
+            'lon': -16.4896,
+            'description': 'Ancienne capitale du Sénégal'
+        },
+        'Tambacounda': {
+            'lat': 13.7707, 
+            'lon': -13.6673,
+            'description': 'Plus grande région du Sénégal'
+        },
+        'Kaolack': {
+            'lat': 14.1667, 
+            'lon': -16.0833,
+            'description': 'Centre commercial important'
+        },
+        'Ziguinchor': {
+            'lat': 12.5667, 
+            'lon': -16.2667,
+            'description': 'Capitale de la Casamance'
+        },
+        'Thiès': {
+            'lat': 14.7833, 
+            'lon': -16.9333,
+            'description': 'Centre industriel majeur'
+        },
+        'Louga': {
+            'lat': 15.6167, 
+            'lon': -16.2167,
+            'description': 'Zone agricole importante'
+        },
+        'Diourbel': {
+            'lat': 14.6500, 
+            'lon': -16.2333,
+            'description': 'Centre religieux important'
+        },
+        'Kolda': {
+            'lat': 12.8833, 
+            'lon': -14.9500,
+            'description': 'Région agricole du sud'
+        },
+        'Fatick': {
+            'lat': 14.3333, 
+            'lon': -16.4000,
+            'description': 'Zone de production de sel'
+        },
+        'Matam': {
+            'lat': 15.6667, 
+            'lon': -13.2500,
+            'description': 'Région frontalière avec le Mali'
+        },
+        'Kaffrine': {
+            'lat': 14.1667, 
+            'lon': -15.5500,
+            'description': 'Zone agricole centrale'
+        },
+        'Sédhiou': {
+            'lat': 12.7000, 
+            'lon': -15.5500,
+            'description': 'Région de la Casamance'
+        },
+        'Kédougou': {
+            'lat': 12.5500, 
+            'lon': -12.1833,
+            'description': 'Région minière'
+        }
+    }
+    
     # Création des répertoires d'export
     os.makedirs(PDF_EXPORT_DIR, exist_ok=True)
     os.makedirs(CSV_EXPORT_DIR, exist_ok=True)

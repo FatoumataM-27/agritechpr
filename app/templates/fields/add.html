@@ -7,17 +7,26 @@
     <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div class="d-flex align-items-center">
-            <a href="{{ url_for('main.fields') }}" class="text-dark me-3">
+            <a href="{{ url_for('fields.index') }}" class="text-dark me-3">
                 <i class="fas fa-arrow-left"></i>
             </a>
             <h5 class="mb-0">Ajouter un champ</h5>
         </div>
     </div>
 
+    <!-- Messages flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
     <!-- Formulaire -->
     <div class="card">
         <div class="card-body">
-            <form method="POST" action="{{ url_for('main.add_field') }}">
+            <form method="POST" action="{{ url_for('fields.add') }}">
                 <div class="mb-3">
                     <label for="name" class="form-label">Nom du champ</label>
                     <input type="text" class="form-control" id="name" name="name" required>

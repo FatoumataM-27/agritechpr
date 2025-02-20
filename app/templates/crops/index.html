@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Mes Cultures{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Mes Cultures</h1>
+        <a href="{{ url_for('crops.add_crop') }}" class="btn btn-success">
+            <i class="fas fa-plus"></i> Ajouter une culture
+        </a>
+    </div>
+
+    {% if not crops %}
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle"></i> Vous n'avez pas encore de cultures. 
+        <a href="{{ url_for('crops.add_crop') }}" class="alert-link">Commencez par en ajouter une</a>.
+    </div>
+    {% else %}
+    <div class="row g-4">
+        {% for crop in crops %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">{{ crop.name }}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">{{ crop.variety }}</h6>
+                    <div class="mb-3">
+                        <small class="text-muted">
+                            <i class="fas fa-calendar"></i> Planté le: {{ crop.planting_date.strftime('%d/%m/%Y') }}
+                        </small>
+                    </div>
+                    <div class="mb-3">
+                        <span class="badge bg-{{ 'success' if crop.status == 'active' else 'secondary' }}">
+                            {{ crop.status }}
+                        </span>
+                    </div>
+                    <p class="card-text">{{ crop.notes[:100] + '...' if crop.notes and crop.notes|length > 100 else crop.notes }}</p>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <div class="btn-group w-100">
+                        <a href="{{ url_for('crops.view_crop', crop_id=crop.id) }}" class="btn btn-outline-primary">
+                            <i class="fas fa-eye"></i> Voir
+                        </a>
+                        <a href="{{ url_for('crops.edit_crop', crop_id=crop.id) }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-edit"></i> Modifier
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+.card {
+    transition: transform 0.2s;
+    border-radius: 10px;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.btn-group .btn {
+    border-radius: 0;
+}
+
+.btn-group .btn:first-child {
+    border-bottom-left-radius: 10px;
+}
+
+.btn-group .btn:last-child {
+    border-bottom-right-radius: 10px;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Ajouter une Culture{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h2 class="h5 mb-0">Ajouter une nouvelle culture</h2>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('crops.add_crop') }}">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Nom de la culture *</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="variety" class="form-label">Variété</label>
+                            <input type="text" class="form-control" id="variety" name="variety">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="field_id" class="form-label">Champ *</label>
+                            <select class="form-select" id="field_id" name="field_id" required>
+                                <option value="">Sélectionnez un champ</option>
+                                {% for field in fields %}
+                                <option value="{{ field.id }}">{{ field.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="planting_date" class="form-label">Date de plantation *</label>
+                            <input type="date" class="form-control" id="planting_date" name="planting_date" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="expected_harvest_date" class="form-label">Date de récolte prévue</label>
+                            <input type="date" class="form-control" id="expected_harvest_date" name="expected_harvest_date">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="notes" class="form-label">Notes</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save"></i> Enregistrer
+                            </button>
+                            <a href="{{ url_for('crops.index') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i> Annuler
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+.card {
+    border-radius: 15px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+}
+
+.card-header {
+    border-top-left-radius: 15px !important;
+    border-top-right-radius: 15px !important;
+}
+
+.form-control, .form-select {
+    border-radius: 10px;
+}
+
+.btn {
+    border-radius: 10px;
+    padding: 10px 20px;
+}
+</style>
+{% endblock %}

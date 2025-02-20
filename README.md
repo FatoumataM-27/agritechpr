@@ -1,46 +1,45 @@
-# AgriTechPro - Plateforme de Gestion Agricole
+# AgriTechPR - Plateforme de Gestion Agricole
 
-## 📱 Description
-AgriTechPro est une application web moderne conçue pour aider les agriculteurs sénégalais à gérer efficacement leurs exploitations agricoles. Elle offre des fonctionnalités de suivi des champs, de gestion des tâches et d'accès aux données météorologiques.
+## Description du Projet
+AgriTechPR est une application web Flask qui aide les agriculteurs à gérer leurs champs, suivre les conditions météorologiques, et planifier leurs tâches agricoles.
 
-## 🚀 Fonctionnalités
+## Fonctionnalités Principales
+- Gestion des champs agricoles
+- Suivi météorologique
+- Planification des tâches
+- Notifications en temps réel
+- Tableau de bord interactif
+- Authentification des utilisateurs
 
-### Gestion des utilisateurs
-- Inscription et connexion sécurisée
-- Gestion de profil utilisateur
-- Authentification avec Flask-Login
-
-### Gestion des champs
-- Ajout et suivi des champs
-- Visualisation des données de croissance
-- Cartographie des parcelles
-
-### Suivi météorologique
-- Données météo en temps réel
-- Prévisions personnalisées
-- Alertes météo
-
-### Gestion des tâches
-- Planification des activités agricoles
-- Suivi des tâches
-- Notifications et rappels
-
-## 🛠 Technologies utilisées
-- **Backend**: Python/Flask
-- **Frontend**: HTML5, CSS3, Bootstrap 5
-- **Base de données**: SQLite avec SQLAlchemy
-- **Authentification**: Flask-Login
-- **API**: Flask-RESTful (en cours)
-
-## 📦 Installation
-
-1. Cloner le repository
-```bash
-git clone https://github.com/FatoumataM-27/agritechpro.git
-cd agritechpro
+## Structure du Projet
+```
+agritechpr/
+├── app/
+│   ├── routes/
+│   ├── models/
+│   ├── templates/
+│   └── static/
+├── migrations/
+├── tests/
+├── config.py
+└── requirements.txt
 ```
 
-2. Créer un environnement virtuel
+## Configuration du Développement
+
+### Prérequis
+- Python 3.8+
+- pip
+- virtualenv
+
+### Installation
+1. Cloner le repository
+```bash
+git clone https://github.com/FatoumataM-27/agritechpr.git
+cd agritechpr
+```
+
+2. Créer et activer l'environnement virtuel
 ```bash
 python -m venv venv
 source venv/bin/activate  # Linux/Mac
@@ -61,31 +60,40 @@ cp .env.example .env
 5. Initialiser la base de données
 ```bash
 flask db upgrade
+python init_db.py
 ```
 
-6. Lancer l'application
+### Lancer l'application
 ```bash
 flask run
 ```
 
-## 🌳 Structure du projet
-```
-agritechpro/
-├── app/
-│   ├── models/          # Modèles de données
-│   ├── routes/          # Routes et contrôleurs
-│   ├── templates/       # Templates HTML
-│   └── __init__.py     # Configuration Flask
-├── migrations/         # Migrations de base de données
-├── tests/             # Tests unitaires et d'intégration
-├── config.py          # Configuration
-├── requirements.txt   # Dépendances
-└── run.py            # Point d'entrée
+## Stratégie de Branches
+- `main`: branche de production
+- `develop`: branche de développement principale
+- `feature/*`: branches pour les nouvelles fonctionnalités
+- `bugfix/*`: branches pour les corrections de bugs
+- `hotfix/*`: branches pour les corrections urgentes en production
+
+## Workflow de Développement
+1. Créer une nouvelle branche depuis `develop`
+2. Développer la fonctionnalité
+3. Tester localement
+4. Créer une Pull Request
+5. Review du code
+6. Merge dans `develop`
+
+## Tests
+```bash
+pytest
 ```
 
-## 👥 Équipe
-- Développeur 1 (@dev1)
-- Développeur 2 (@dev2)
+## Déploiement
+L'application est configurée pour le déploiement sur Heroku ou un serveur similaire.
 
-## 📝 License
-Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
+## Équipe
+- [Membre 1]
+- [Membre 2]
+
+## Licence
+[Votre licence]

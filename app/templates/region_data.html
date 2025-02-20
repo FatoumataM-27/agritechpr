@@ -1,0 +1,248 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% if not current_user.is_authenticated %}
+<div class="auth-message">
+    <h2>Connexion requise</h2>
+    <p>Veuillez vous <a href="{{ url_for('auth.login') }}">connecter</a> ou vous <a href="{{ url_for('auth.register') }}">inscrire</a> pour accéder aux données météorologiques.</p>
+</div>
+{% else %}
+<div class="conteneur-donnees-region">
+    <div class="entete">
+        <a href="{{ url_for('main.index') }}" class="bouton-retour">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <h1>Données des régions du Sénégal</h1>
+        <div class="user-info">
+            <span>{{ current_user.username }}</span>
+            <span class="region-base">{{ current_user.region or 'Région non définie' }}</span>
+        </div>
+    </div>
+
+    <div class="conteneur-carte">
+        <img src="{{ url_for('static', filename='images/cartesen.jpeg') }}" alt="Carte du Sénégal" class="carte-senegal">
+    </div>
+
+    <div class="conteneur-recherche">
+        <input type="text" 
+               id="recherche-region" 
+               list="liste-regions"
+               placeholder="Rechercher une région..." 
+               class="champ-recherche"
+               autocomplete="off">
+        <datalist id="liste-regions">
+            {% for region in regions %}
+            <option value="{{ region }}">{{ region }}</option>
+            {% endfor %}
+        </datalist>
+        <i class="fas fa-search icone-recherche"></i>
+    </div>
+
+    <div id="message-initial" class="message-initial">
+        <i class="fas fa-search"></i>
+        <p>Recherchez une région pour voir les données météorologiques</p>
+    </div>
+
+    <div class="donnees-meteo" id="donnees-meteo" style="display: none;">
+        <div class="entete-meteo">
+            <div class="region-info">
+                <h2></h2>
+                <span class="description"></span>
+                <span class="mise-a-jour"></span>
+            </div>
+            <button id="ajouter-favori" class="btn-favori">
+                <i class="fas fa-star"></i>
+            </button>
+        </div>
+        <div class="grille-meteo">
+            <div class="element-meteo">
+                <i class="fas fa-thermometer-half"></i>
+                <div class="info-meteo">
+                    <span class="etiquette">Température</span>
+                    <span class="valeur"></span>
+                </div>
+            </div>
+            <div class="element-meteo">
+                <i class="fas fa-cloud-rain"></i>
+                <div class="info-meteo">
+                    <span class="etiquette">Précipitations</span>
+                    <span class="valeur"></span>
+                </div>
+            </div>
+            <div class="element-meteo">
+                <i class="fas fa-tint"></i>
+                <div class="info-meteo">
+                    <span class="etiquette">Humidité</span>
+                    <span class="valeur"></span>
+                </div>
+            </div>
+            <div class="element-meteo">
+                <i class="fas fa-wind"></i>
+                <div class="info-meteo">
+                    <span class="etiquette">Vent</span>
+                    <span class="valeur"></span>
+                </div>
+            </div>
+            <div class="element-meteo">
+                <i class="fas fa-sun"></i>
+                <div class="info-meteo">
+                    <span class="etiquette">Ensoleillement</span>
+                    <span class="valeur"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="regions-favorites">
+        <h3>Mes régions favorites</h3>
+        <div class="liste-favoris">
+            {% if regions_favorites %}
+                {% for favori in regions_favorites %}
+                <div class="favori-item" data-id="{{ favori.id }}">
+                    <span class="favori-nom">{{ favori.region }}</span>
+                    {% if favori.notes %}
+                    <span class="favori-notes">{{ favori.notes }}</span>
+                    {% endif %}
+                    <button class="btn-supprimer-favori">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p class="aucun-favori">Aucune région favorite</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <nav class="navigation-bas">
+        <a href="{{ url_for('main.index') }}" class="element-nav">
+            <i class="fas fa-home"></i>
+            <span>Accueil</span>
+        </a>
+        <a href="{{ url_for('main.fields') }}" class="element-nav">
+            <i class="fas fa-seedling"></i>
+            <span>Champs</span>
+        </a>
+        <a href="{{ url_for('main.tasks') }}" class="element-nav">
+            <i class="fas fa-tasks"></i>
+            <span>Tâches</span>
+        </a>
+        <a href="{{ url_for('region_data.show_data') }}" class="element-nav actif">
+            <i class="fas fa-chart-bar"></i>
+            <span>Données</span>
+        </a>
+        <a href="{{ url_for('main.profile') }}" class="element-nav">
+            <i class="fas fa-user"></i>
+            <span>Profil</span>
+        </a>
+    </nav>
+</div>
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('recherche-region');
+    const btnAjouterFavori = document.getElementById('ajouter-favori');
+    const donneesMeteo = document.getElementById('donnees-meteo');
+    const messageInitial = document.getElementById('message-initial');
+    
+    // Fonction pour mettre à jour les données météo
+    function updateMeteoData() {
+        const region = searchInput.value.trim();
+        if (region) {
+            fetch(`/data/api/meteo/${encodeURIComponent(region)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.erreur) {
+                        // Cacher le message initial et afficher les données
+                        messageInitial.style.display = 'none';
+                        donneesMeteo.style.display = 'block';
+                        
+                        // Mettre à jour l'interface
+                        document.querySelector('.region-info h2').textContent = data.region;
+                        document.querySelector('.description').textContent = data.description;
+                        document.querySelector('.mise-a-jour').textContent = `Mise à jour: ${data.date_mise_a_jour}`;
+                        
+                        // Mettre à jour les valeurs météo
+                        document.querySelector('.element-meteo:nth-child(1) .valeur').textContent = `${data.temperature}°C`;
+                        document.querySelector('.element-meteo:nth-child(2) .valeur').textContent = `${data.precipitations}%`;
+                        document.querySelector('.element-meteo:nth-child(3) .valeur').textContent = `${data.humidite}%`;
+                        document.querySelector('.element-meteo:nth-child(4) .valeur').textContent = `${data.vent} km/h`;
+                        document.querySelector('.element-meteo:nth-child(5) .valeur').textContent = `${data.rayonnement}%`;
+                        
+                        btnAjouterFavori.setAttribute('data-region', data.region);
+                    } else {
+                        alert(data.erreur);
+                    }
+                })
+                .catch(error => console.error('Erreur:', error));
+        } else {
+            // Si aucune région n'est sélectionnée, afficher le message initial
+            messageInitial.style.display = 'block';
+            donneesMeteo.style.display = 'none';
+        }
+    }
+    
+    // Mettre à jour les données toutes les 5 minutes
+    setInterval(updateMeteoData, 300000);
+    
+    // Gestionnaire de recherche
+    searchInput.addEventListener('input', function() {
+        const region = this.value.trim();
+        if (region) {
+            updateMeteoData();
+        }
+    });
+
+    // Gestionnaire d'ajout aux favoris
+    btnAjouterFavori.addEventListener('click', function() {
+        const region = this.getAttribute('data-region');
+        const notes = prompt('Ajouter une note (optionnel):');
+        
+        const formData = new FormData();
+        formData.append('region', region);
+        if (notes) formData.append('notes', notes);
+        
+        fetch('/data/favoris/ajouter', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (!data.erreur) {
+                location.reload();
+            } else {
+                alert(data.erreur);
+            }
+        })
+        .catch(error => console.error('Erreur:', error));
+    });
+
+    // Gestionnaire de suppression des favoris
+    document.querySelectorAll('.btn-supprimer-favori').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const favoriItem = this.closest('.favori-item');
+            const favoriId = favoriItem.getAttribute('data-id');
+            
+            if (confirm('Voulez-vous vraiment supprimer cette région des favoris ?')) {
+                fetch(`/data/favoris/supprimer/${favoriId}`, {
+                    method: 'DELETE'
+                })
+                .then(response => {
+                    if (response.ok) {
+                        favoriItem.remove();
+                        if (document.querySelectorAll('.favori-item').length === 0) {
+                            document.querySelector('.liste-favoris').innerHTML = 
+                                '<p class="aucun-favori">Aucune région favorite</p>';
+                        }
+                    }
+                })
+                .catch(error => console.error('Erreur:', error));
+            }
+        });
+    });
+});
+</script>
+{% endblock %}
+{% endif %}
+{% endblock %}

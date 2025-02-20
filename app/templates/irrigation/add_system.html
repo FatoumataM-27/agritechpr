@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}Ajouter un système d'irrigation{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('irrigation.index') }}">Irrigation</a></li>
+            <li class="breadcrumb-item active">Ajouter un système</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Nouveau système d'irrigation</h5>
+                </div>
+                <div class="card-body">
+                    <form action="{{ url_for('irrigation.add_system') }}" method="POST">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Nom du système</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="field" class="form-label">Champ</label>
+                            <select class="form-select" id="field" name="field_id" required>
+                                <option value="">Sélectionnez un champ</option>
+                                {% for field in fields %}
+                                <option value="{{ field.id }}">{{ field.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="type" class="form-label">Type de système</label>
+                            <select class="form-select" id="type" name="type" required>
+                                <option value="">Sélectionnez un type</option>
+                                <option value="goutte-à-goutte">Goutte-à-goutte</option>
+                                <option value="aspersion">Aspersion</option>
+                                <option value="micro-aspersion">Micro-aspersion</option>
+                                <option value="pivot">Pivot central</option>
+                                <option value="gravitaire">Gravitaire</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="capacity" class="form-label">Capacité (L/h)</label>
+                            <input type="number" class="form-control" id="capacity" name="capacity" step="0.1" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="installation_date" class="form-label">Date d'installation</label>
+                            <input type="date" class="form-control" id="installation_date" name="installation_date" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="notes" class="form-label">Notes</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Enregistrer
+                            </button>
+                            <a href="{{ url_for('irrigation.index') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i> Annuler
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Définir la date d'aujourd'hui comme valeur par défaut
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('installation_date').value = today;
+    
+    // Validation du formulaire
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function(e) {
+        const capacity = document.getElementById('capacity').value;
+        if (capacity <= 0) {
+            e.preventDefault();
+            alert('La capacité doit être supérieure à 0');
+        }
+    });
+});
+</script>
+{% endblock %}
+
+{% block styles %}
+<style>
+.card {
+    border-radius: 15px;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-top-left-radius: 15px !important;
+    border-top-right-radius: 15px !important;
+}
+
+.btn {
+    border-radius: 10px;
+}
+</style>
+{% endblock %}

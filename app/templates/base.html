@@ -67,6 +67,10 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
+                <form class="d-flex mx-auto">
+                    <input class="form-control me-2" type="search" placeholder="Rechercher..." aria-label="Search">
+                    <button class="btn btn-outline-success" type="submit"><i class="fas fa-search"></i></button>
+                </form>
                 <ul class="navbar-nav ms-auto">
                     {% if current_user.is_authenticated %}
                     <li class="nav-item">
@@ -75,8 +79,31 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('main.fields') }}">Champs</a>
                     </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            Cultures
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">Suivi des cultures</a></li>
+                            <li><a class="dropdown-item" href="#">Planification</a></li>
+                            <li><a class="dropdown-item" href="#">Historique</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            Ressources
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">Irrigation</a></li>
+                            <li><a class="dropdown-item" href="#">Sols</a></li>
+                            <li><a class="dropdown-item" href="#">Pesticides/Engrais</a></li>
+                        </ul>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('main.tasks') }}">Tâches</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('region_data.show_data') }}">Météo</a>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">

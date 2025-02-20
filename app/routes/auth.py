@@ -17,13 +17,22 @@ def login():
         password = request.form.get('password')
         remember = True if request.form.get('remember') else False
 
+        print(f"Tentative de connexion pour l'email: {email}")  # Debug log
+        
         user = User.query.filter_by(email=email).first()
+        
+        if not user:
+            print(f"Aucun utilisateur trouvé avec l'email: {email}")  # Debug log
+            flash('Veuillez vérifier vos identifiants et réessayer.')
+            return redirect(url_for('auth.login'))
 
-        if not user or not user.check_password(password):
+        if not user.check_password(password):
+            print(f"Mot de passe incorrect pour l'utilisateur: {email}")  # Debug log
             flash('Veuillez vérifier vos identifiants et réessayer.')
             return redirect(url_for('auth.login'))
 
         login_user(user, remember=remember)
+        print(f"Connexion réussie pour l'utilisateur: {email}")  # Debug log
         log_info(None, f"Connexion réussie pour {user.email}")
         next_page = request.args.get('next')
         return redirect(next_page if next_page else url_for('main.dashboard'))

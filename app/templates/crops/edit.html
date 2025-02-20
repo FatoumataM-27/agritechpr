@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Modifier {{ crop.name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('crops.index') }}">Cultures</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('crops.view_crop', crop_id=crop.id) }}">{{ crop.name }}</a></li>
+            <li class="breadcrumb-item active">Modifier</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h5 mb-0">Modifier la culture</h2>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('crops.edit_crop', crop_id=crop.id) }}">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Nom de la culture *</label>
+                            <input type="text" class="form-control" id="name" name="name" value="{{ crop.name }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="variety" class="form-label">Variété</label>
+                            <input type="text" class="form-control" id="variety" name="variety" value="{{ crop.variety }}">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="planting_date" class="form-label">Date de plantation *</label>
+                            <input type="date" class="form-control" id="planting_date" name="planting_date" 
+                                   value="{{ crop.planting_date.strftime('%Y-%m-%d') }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="expected_harvest_date" class="form-label">Date de récolte prévue</label>
+                            <input type="date" class="form-control" id="expected_harvest_date" name="expected_harvest_date"
+                                   value="{{ crop.expected_harvest_date.strftime('%Y-%m-%d') if crop.expected_harvest_date }}">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="status" class="form-label">Statut *</label>
+                            <select class="form-select" id="status" name="status" required>
+                                <option value="active" {{ 'selected' if crop.status == 'active' }}>Active</option>
+                                <option value="harvested" {{ 'selected' if crop.status == 'harvested' }}>Récoltée</option>
+                                <option value="failed" {{ 'selected' if crop.status == 'failed' }}>Échec</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="notes" class="form-label">Notes</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="3">{{ crop.notes }}</textarea>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Enregistrer les modifications
+                            </button>
+                            <a href="{{ url_for('crops.view_crop', crop_id=crop.id) }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i> Annuler
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+.card {
+    border-radius: 15px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+}
+
+.card-header {
+    border-top-left-radius: 15px !important;
+    border-top-right-radius: 15px !important;
+}
+
+.form-control, .form-select {
+    border-radius: 10px;
+}
+
+.btn {
+    border-radius: 10px;
+    padding: 10px 20px;
+}
+</style>
+{% endblock %}

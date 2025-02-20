@@ -7,6 +7,7 @@ class Task(db.Model):
     description = db.Column(db.Text)
     due_date = db.Column(db.DateTime, nullable=False)
     status = db.Column(db.String(20), default='à faire')  # 'à faire' ou 'terminée'
+    priority = db.Column(db.String(20), default='moyenne')  # 'basse', 'moyenne', 'haute'
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     field_id = db.Column(db.Integer, db.ForeignKey('field.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)

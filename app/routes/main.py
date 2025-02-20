@@ -12,6 +12,8 @@ main = Blueprint('main', __name__)
 
 @main.route('/')
 def index():
+    if current_user.is_authenticated:
+        return redirect(url_for('main.dashboard'))
     return render_template('index.html')
 
 @main.route('/dashboard')
@@ -245,8 +247,14 @@ def tasks():
     try:
         # Récupérer les tâches de l'utilisateur
         tasks = Task.query.filter_by(user_id=current_user.id).order_by(Task.due_date).all()
+        
+        # Calculer les jours restants pour chaque tâche
+        for task in tasks:
+            task.days = task.days_remaining()
+        
         # Récupérer les champs pour le formulaire d'ajout
         fields = Field.query.filter_by(user_id=current_user.id).all()
+        
         return render_template('tasks.html', tasks=tasks, fields=fields)
     except Exception as e:
         flash('Une erreur est survenue lors du chargement des tâches.', 'error')
@@ -277,21 +285,19 @@ def add_task():
             title=title,
             description=description or '',
             due_date=datetime.strptime(due_date, '%Y-%m-%d'),
-            priority=priority,
             field_id=field_id,
-            user_id=current_user.id
+            user_id=current_user.id,
+            priority=priority,
+            status='à faire'
         )
         
         db.session.add(task)
         db.session.commit()
-        
         flash('Tâche ajoutée avec succès!', 'success')
         
-    except ValueError:
-        flash('Format de date invalide', 'error')
     except Exception as e:
         db.session.rollback()
-        flash('Une erreur est survenue lors de l\'ajout de la tâche', 'error')
+        flash(f'Une erreur est survenue lors de l\'ajout de la tâche: {str(e)}', 'error')
     
     return redirect(url_for('main.tasks'))
 

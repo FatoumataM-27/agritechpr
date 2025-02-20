@@ -1,0 +1,363 @@
+{% extends "base.html" %}
+
+{% block title %}{{ system.name }} - Détails{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('irrigation.index') }}">Irrigation</a></li>
+            <li class="breadcrumb-item active">{{ system.name }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <!-- Informations système -->
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Informations système</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <strong>Statut:</strong>
+                            <span class="badge bg-{{ 'success' if system.status == 'active' else 'warning' if system.status == 'maintenance' else 'secondary' }}">
+                                {{ system.status }}
+                            </span>
+                        </li>
+                        <li class="mb-2"><strong>Type:</strong> {{ system.type }}</li>
+                        <li class="mb-2"><strong>Capacité:</strong> {{ system.capacity }} L/h</li>
+                        <li class="mb-2"><strong>Champ:</strong> {{ system.field.name }}</li>
+                        <li class="mb-2">
+                            <strong>Installation:</strong>
+                            {{ system.installation_date.strftime('%d/%m/%Y') }}
+                        </li>
+                        {% if system.last_maintenance %}
+                        <li class="mb-2">
+                            <strong>Dernière maintenance:</strong>
+                            {{ system.last_maintenance.strftime('%d/%m/%Y') }}
+                        </li>
+                        {% endif %}
+                    </ul>
+                    {% if system.notes %}
+                    <div class="mt-3">
+                        <strong>Notes:</strong>
+                        <p class="text-muted mb-0">{{ system.notes }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer">
+                    <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#maintenanceModal">
+                        <i class="fas fa-tools"></i> Maintenance
+                    </button>
+                    <button class="btn btn-danger btn-sm" onclick="confirmDeactivate()">
+                        <i class="fas fa-power-off"></i> Désactiver
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Horaires -->
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Horaires d'irrigation</h5>
+                    <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#scheduleModal">
+                        <i class="fas fa-plus"></i> Ajouter
+                    </button>
+                </div>
+                <div class="card-body">
+                    {% if schedules %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Heure</th>
+                                    <th>Durée</th>
+                                    <th>Jours</th>
+                                    <th>Eau</th>
+                                    <th>Statut</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for schedule in schedules %}
+                                <tr>
+                                    <td>{{ schedule.start_time.strftime('%H:%M') }}</td>
+                                    <td>{{ schedule.duration }} min</td>
+                                    <td>{{ schedule.days }}</td>
+                                    <td>{{ schedule.water_amount|default('-', true) }} L</td>
+                                    <td>
+                                        <span class="badge bg-{{ 'success' if schedule.active else 'secondary' }}">
+                                            {{ 'Actif' if schedule.active else 'Inactif' }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <form action="{{ url_for('irrigation.toggle_schedule', schedule_id=schedule.id) }}" method="POST" class="d-inline">
+                                            <button type="submit" class="btn btn-sm btn-{{ 'secondary' if schedule.active else 'success' }}">
+                                                <i class="fas fa-{{ 'pause' if schedule.active else 'play' }}"></i>
+                                            </button>
+                                        </form>
+                                        <button class="btn btn-danger btn-sm" onclick="deleteSchedule({{ schedule.id }})">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        Aucun horaire d'irrigation configuré.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Historique -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Historique d'irrigation</h5>
+                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#logModal">
+                        <i class="fas fa-plus"></i> Ajouter un log
+                    </button>
+                </div>
+                <div class="card-body">
+                    {% if logs %}
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Durée</th>
+                                    <th>Eau utilisée</th>
+                                    <th>Statut</th>
+                                    <th>Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for log in logs %}
+                                <tr>
+                                    <td>{{ log.start_time.strftime('%d/%m/%Y %H:%M') }}</td>
+                                    <td>
+                                        {% if log.end_time %}
+                                        {{ ((log.end_time - log.start_time).total_seconds() / 60)|round|int }} min
+                                        {% else %}
+                                        En cours
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ log.water_used|default('-', true) }} L</td>
+                                    <td>
+                                        <span class="badge bg-{{ 'success' if log.status == 'completed' else 'warning' if log.status == 'interrupted' else 'danger' }}">
+                                            {{ log.status }}
+                                        </span>
+                                    </td>
+                                    <td>{{ log.notes|default('-', true) }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        Aucun historique d'irrigation disponible.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Horaire -->
+<div class="modal fade" id="scheduleModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{ url_for('irrigation.add_schedule') }}" method="POST">
+                <div class="modal-header">
+                    <h5 class="modal-title">Ajouter un horaire</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="system_id" value="{{ system.id }}">
+                    <div class="mb-3">
+                        <label class="form-label">Heure de début</label>
+                        <input type="time" name="start_time" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Durée (minutes)</label>
+                        <input type="number" name="duration" class="form-control" required min="1">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Jours</label>
+                        <div class="btn-group w-100" role="group">
+                            {% for day in ['L', 'M', 'M', 'J', 'V', 'S', 'D'] %}
+                            <input type="checkbox" class="btn-check" name="days" value="{{ loop.index }}" id="day{{ loop.index }}">
+                            <label class="btn btn-outline-primary" for="day{{ loop.index }}">{{ day }}</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Quantité d'eau (L)</label>
+                        <input type="number" name="water_amount" class="form-control" step="0.1">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Ajouter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Log -->
+<div class="modal fade" id="logModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{ url_for('irrigation.add_log') }}" method="POST">
+                <div class="modal-header">
+                    <h5 class="modal-title">Ajouter un log</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="system_id" value="{{ system.id }}">
+                    <div class="mb-3">
+                        <label class="form-label">Date et heure de début</label>
+                        <input type="datetime-local" name="start_time" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Date et heure de fin</label>
+                        <input type="datetime-local" name="end_time" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Eau utilisée (L)</label>
+                        <input type="number" name="water_used" class="form-control" step="0.1">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Statut</label>
+                        <select name="status" class="form-select" required>
+                            <option value="completed">Terminé</option>
+                            <option value="interrupted">Interrompu</option>
+                            <option value="failed">Échec</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Notes</label>
+                        <textarea name="notes" class="form-control" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Ajouter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Maintenance -->
+<div class="modal fade" id="maintenanceModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Maintenance du système</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="maintenanceForm">
+                    <div class="mb-3">
+                        <label class="form-label">Type de maintenance</label>
+                        <select class="form-select" required>
+                            <option value="routine">Maintenance de routine</option>
+                            <option value="repair">Réparation</option>
+                            <option value="upgrade">Mise à niveau</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Date prévue</label>
+                        <input type="date" class="form-control" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary" onclick="scheduleMaintenance()">Planifier</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function confirmDeactivate() {
+    if (confirm('Voulez-vous vraiment désactiver ce système d\'irrigation ?')) {
+        // TODO: Implémenter la désactivation
+        alert('Fonctionnalité en cours de développement');
+    }
+}
+
+function deleteSchedule(scheduleId) {
+    if (confirm('Voulez-vous vraiment supprimer cet horaire ?')) {
+        // TODO: Implémenter la suppression
+        alert('Fonctionnalité en cours de développement');
+    }
+}
+
+function scheduleMaintenance() {
+    // TODO: Implémenter la planification de maintenance
+    alert('Fonctionnalité en cours de développement');
+    $('#maintenanceModal').modal('hide');
+}
+
+// Mise à jour du statut toutes les 30 secondes
+setInterval(function() {
+    fetch(`/irrigation/api/system/{{ system.id }}/status`)
+        .then(response => response.json())
+        .then(data => {
+            const badge = document.querySelector('.card-body .badge');
+            badge.className = `badge bg-${data.status === 'active' ? 'success' : data.status === 'maintenance' ? 'warning' : 'secondary'}`;
+            badge.textContent = data.status;
+        });
+}, 30000);
+
+// Gestion des jours de la semaine
+document.querySelector('form').addEventListener('submit', function(e) {
+    if (this.action.includes('add_schedule')) {
+        const days = Array.from(document.querySelectorAll('input[name="days"]:checked'))
+            .map(cb => cb.value)
+            .join(',');
+        if (!days) {
+            e.preventDefault();
+            alert('Veuillez sélectionner au moins un jour');
+        } else {
+            const daysInput = document.createElement('input');
+            daysInput.type = 'hidden';
+            daysInput.name = 'days';
+            daysInput.value = days;
+            this.appendChild(daysInput);
+        }
+    }
+});
+</script>
+{% endblock %}
+
+{% block styles %}
+<style>
+.btn-check:checked + .btn-outline-primary {
+    background-color: var(--bs-primary);
+    color: white;
+}
+
+.table td {
+    vertical-align: middle;
+}
+</style>
+{% endblock %}

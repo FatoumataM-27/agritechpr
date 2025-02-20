@@ -24,7 +24,8 @@ def create_app(config_class=Config):
     
     # Configuration de la base de données
     db_path = os.path.join(app.instance_path, 'agritech.db')
-    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
+    if not app.config['SQLALCHEMY_DATABASE_URI']:
+        app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SECRET_KEY'] = 'dev-key-agritech-pro-2025'
     
@@ -46,12 +47,19 @@ def create_app(config_class=Config):
     # Enregistrement des blueprints
     from app.routes.auth import auth
     from app.routes.main import main
-    from app.api.fields import api_bp
-    from app.api.metrics import bp as metrics_bp
-
+    from app.routes.fields import fields
+    from app.routes.region_data import region_data as region_data_bp
+    from app.routes.crops import crops
     app.register_blueprint(auth)
     app.register_blueprint(main)
+    app.register_blueprint(fields)
+    app.register_blueprint(region_data_bp)
+    app.register_blueprint(crops)
+    
+    from app.api.fields import api_bp
     app.register_blueprint(api_bp, url_prefix='/api/v1')
+    
+    from app.api.metrics import bp as metrics_bp
     app.register_blueprint(metrics_bp, url_prefix='/api')
 
     # Configuration Swagger UI
@@ -70,6 +78,11 @@ def create_app(config_class=Config):
     @app.route("/api/swagger.json")
     def specs():
         return jsonify(template)
+
+    from app.commands.init_meteo_data import init_meteo_command
+    
+    # Enregistrement des commandes
+    app.cli.add_command(init_meteo_command)
 
     # Création des tables
     with app.app_context():

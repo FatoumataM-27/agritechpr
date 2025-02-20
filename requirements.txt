@@ -1,10 +1,10 @@
 Flask==2.3.3
 Flask-Login==0.6.2
-Flask-SQLAlchemy==3.0.5
+Flask-SQLAlchemy==3.1.1
 Flask-Migrate==4.0.4
 Flask-WTF==1.1.1
 Werkzeug==2.3.7
-SQLAlchemy==2.0.20
+SQLAlchemy==2.0.25
 email-validator==2.0.0
 Flask-RESTful==0.3.10
 flask-swagger-ui==4.11.1
@@ -12,7 +12,6 @@ pytest==7.4.2
 black==23.7.0
 flake8==6.1.0
 gunicorn==21.2.0
-psycopg2-binary==2.9.7
 
 # Celery et dépendances
 celery==5.3.6
@@ -38,4 +37,5 @@ pywebpush==1.14.0
 scikit-learn==1.2.2
 pandas==2.0.3
 grafana-api==1.0.3
-python-dotenv==1.0.0
+python-dotenv==1.0.1
+requests==2.31.0
