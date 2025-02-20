@@ -1,8 +1,8 @@
-# AgriTechPro 
+# AgriTechPro 🌱
 
 ## Présentation du Projet
 
-AgriTechPro est une application web innovante de gestion agricole développée pour aider les agriculteurs sénégalais à optimiser leurs activités agricoles. L'application combine des fonctionnalités de gestion des champs, de suivi des tâches et d'informations météorologiques pour une agriculture plus efficace et durable.
+AgriTechPro est un site web innovant de gestion agricole développé pour aider les agriculteurs sénégalais à optimiser leurs activités agricoles. Le site combine des fonctionnalités de gestion des champs, de suivi des tâches et d'informations météorologiques pour une agriculture plus efficace et durable.
 
 ## Architecture du Projet
 
