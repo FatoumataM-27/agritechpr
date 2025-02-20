@@ -163,5 +163,5 @@ flask run
 ## Contact
 
 - **Développeur**: Fatoumata
-- **Email**: fatoumata@gmail.com
+- **Email**: fatoumatacoropmballo1@gmail.com
 - **GitHub**: [FatoumataM-27](https://github.com/FatoumataM-27)
