@@ -1,99 +1,167 @@
-# AgriTechPR - Plateforme de Gestion Agricole
+# AgriTechPro 
 
-## Description du Projet
-AgriTechPR est une application web Flask qui aide les agriculteurs à gérer leurs champs, suivre les conditions météorologiques, et planifier leurs tâches agricoles.
+## Présentation du Projet
+
+AgriTechPro est une application web innovante de gestion agricole développée pour aider les agriculteurs sénégalais à optimiser leurs activités agricoles. L'application combine des fonctionnalités de gestion des champs, de suivi des tâches et d'informations météorologiques pour une agriculture plus efficace et durable.
+
+## Architecture du Projet
+
+```
+AgriTechPro/
+├── app/                      # Application principale
+│   ├── models/              # Modèles de données
+│   │   ├── user.py         # Gestion des utilisateurs
+│   │   ├── field.py        # Gestion des champs
+│   │   ├── task.py         # Gestion des tâches
+│   │   ├── notification.py # Système de notifications
+│   │   └── weather_data.py # Données météorologiques
+│   ├── routes/             # Routes de l'application
+│   │   ├── main.py        # Routes principales
+│   │   ├── auth.py        # Authentification
+│   │   └── region_data.py # Données régionales
+│   ├── templates/          # Templates Jinja2
+│   │   ├── base.html      # Template de base
+│   │   ├── dashboard.html # Tableau de bord
+│   │   └── ...           # Autres templates
+│   └── static/            # Fichiers statiques
+├── migrations/             # Migrations de base de données
+├── tests/                 # Tests unitaires et d'intégration
+└── instance/              # Configuration et base de données
+```
+
+## Schéma des Branches Git
+
+```mermaid
+gitGraph
+   commit id: "Initial commit"
+   branch develop
+   checkout develop
+   commit id: "Setup Flask structure"
+   branch feature/auth
+   checkout feature/auth
+   commit id: "Add user authentication"
+   commit id: "Add login/register"
+   checkout develop
+   merge feature/auth
+   branch feature/fields
+   checkout feature/fields
+   commit id: "Add field management"
+   checkout develop
+   merge feature/fields
+   branch feature/tasks
+   checkout feature/tasks
+   commit id: "Add task system"
+   checkout develop
+   merge feature/tasks
+   branch feature/weather
+   checkout feature/weather
+   commit id: "Add weather data"
+   checkout develop
+   merge feature/weather
+   branch feature/notifications
+   checkout feature/notifications
+   commit id: "Add notifications"
+   checkout develop
+   merge feature/notifications
+   checkout main
+   merge develop
+   commit id: "Release v1.0"
+```
 
 ## Fonctionnalités Principales
-- Gestion des champs agricoles
-- Suivi météorologique
-- Planification des tâches
-- Notifications en temps réel
-- Tableau de bord interactif
-- Authentification des utilisateurs
 
-## Structure du Projet
-```
-agritechpr/
-├── app/
-│   ├── routes/
-│   ├── models/
-│   ├── templates/
-│   └── static/
-├── migrations/
-├── tests/
-├── config.py
-└── requirements.txt
-```
+1. **Authentification Sécurisée** 
+   - Inscription et connexion des utilisateurs
+   - Gestion des profils agriculteurs
+   - Protection des données personnelles
 
-## Configuration du Développement
+2. **Gestion des Champs** 
+   - Ajout et suivi des champs
+   - Informations sur les cultures
+   - Historique des activités
 
-### Prérequis
-- Python 3.8+
-- pip
-- virtualenv
+3. **Système de Tâches** 
+   - Planification des activités agricoles
+   - Rappels et notifications
+   - Suivi de l'avancement
 
-### Installation
-1. Cloner le repository
+4. **Données Météorologiques** 
+   - Prévisions météo par région
+   - Alertes climatiques
+   - Recommandations basées sur la météo
+
+5. **Système de Notifications** 
+   - Alertes en temps réel
+   - Rappels de tâches
+   - Informations météo importantes
+
+## Stack Technique
+
+- **Backend**: Python/Flask
+- **Base de données**: SQLite/SQLAlchemy
+- **Frontend**: HTML/CSS/JavaScript, Bootstrap
+- **Authentification**: Flask-Login
+- **Templates**: Jinja2
+- **Tests**: Pytest
+
+## Installation et Déploiement
+
+1. Cloner le repository :
 ```bash
 git clone https://github.com/FatoumataM-27/agritechpr.git
 cd agritechpr
 ```
 
-2. Créer et activer l'environnement virtuel
+2. Créer un environnement virtuel :
 ```bash
 python -m venv venv
 source venv/bin/activate  # Linux/Mac
 venv\Scripts\activate     # Windows
 ```
 
-3. Installer les dépendances
+3. Installer les dépendances :
 ```bash
 pip install -r requirements.txt
 ```
 
-4. Configurer les variables d'environnement
+4. Configurer les variables d'environnement :
 ```bash
 cp .env.example .env
-# Modifier .env avec vos configurations
+# Éditer .env avec vos configurations
 ```
 
-5. Initialiser la base de données
+5. Initialiser la base de données :
 ```bash
 flask db upgrade
-python init_db.py
+python create_user.py  # Créer un utilisateur initial
 ```
 
-### Lancer l'application
+6. Lancer l'application :
 ```bash
 flask run
 ```
 
-## Stratégie de Branches
-- `main`: branche de production
-- `develop`: branche de développement principale
-- `feature/*`: branches pour les nouvelles fonctionnalités
-- `bugfix/*`: branches pour les corrections de bugs
-- `hotfix/*`: branches pour les corrections urgentes en production
+## Tests et Qualité du Code
 
-## Workflow de Développement
-1. Créer une nouvelle branche depuis `develop`
-2. Développer la fonctionnalité
-3. Tester localement
-4. Créer une Pull Request
-5. Review du code
-6. Merge dans `develop`
+- Tests unitaires avec Pytest
+- Intégration continue avec GitHub Actions
+- Couverture de code > 80%
+- Respect des standards PEP 8
 
-## Tests
-```bash
-pytest
-```
+## Perspectives d'Évolution
 
-## Déploiement
-L'application est configurée pour le déploiement sur Heroku ou un serveur similaire.
+1. **Phase 2 (Q2 2025)**
+   - Intégration de l'IA pour les recommandations
+   - Application mobile
+   - Support multi-langues
 
-## Équipe
-- [Membre 1]
-- [Membre 2]
+2. **Phase 3 (Q4 2025)**
+   - Marketplace agricole
+   - Système de prévisions avancées
+   - Intégration IoT pour les capteurs
 
-## Licence
-[Votre licence]
+## Contact
+
+- **Développeur**: Fatoumata
+- **Email**: fatoumata@gmail.com
+- **GitHub**: [FatoumataM-27](https://github.com/FatoumataM-27)
